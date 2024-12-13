@@ -58,7 +58,7 @@ const Chat = () => {
         if (agentError) throw agentError;
         setAgent(agentData);
 
-        // Fetch previous messages
+        // Fetch previous messages and properly type them
         const { data: messagesData, error: messagesError } = await supabase
           .from('messages')
           .select('role, content')
@@ -66,7 +66,14 @@ const Chat = () => {
           .order('created_at', { ascending: true });
 
         if (messagesError) throw messagesError;
-        setMessages(messagesData);
+        
+        // Ensure the role is either "user" or "assistant"
+        const typedMessages: Message[] = messagesData.map(msg => ({
+          role: msg.role as "user" | "assistant",
+          content: msg.content
+        }));
+        
+        setMessages(typedMessages);
       } catch (error) {
         console.error('Error al cargar datos:', error);
         toast({

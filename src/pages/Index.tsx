@@ -52,7 +52,6 @@ const Index = () => {
         name={agent.name}
         description={agent.description}
         traits={agent.traits || []}
-        interactions={0}
         onSelect={() => console.log("Selected agent:", agent.name)}
       />
     ));
