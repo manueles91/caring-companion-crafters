@@ -15,7 +15,7 @@ interface Message {
 
 const Chat = () => {
   const [searchParams] = useSearchParams();
-  const agentName = searchParams.get("agent") || "AI Friend";
+  const agentName = searchParams.get("agent") || "Amigo IA";
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
@@ -45,10 +45,10 @@ const Chat = () => {
         content: data.message 
       }]);
     } catch (error) {
-      console.error('Chat error:', error);
+      console.error('Error en el chat:', error);
       toast({
         title: "Error",
-        description: "Sorry, I couldn't send your message. Please try again.",
+        description: "Lo siento, no pude enviar tu mensaje. Por favor, intenta de nuevo.",
         variant: "destructive",
       });
     } finally {
@@ -65,7 +65,7 @@ const Chat = () => {
   return (
     <div className="container mx-auto max-w-4xl p-4 h-screen flex flex-col">
       <Card className="flex-1 p-4 flex flex-col">
-        <h1 className="text-2xl font-bold mb-4">Chat with {agentName}</h1>
+        <h1 className="text-2xl font-bold mb-4">Chat con {agentName}</h1>
         
         <ScrollArea ref={scrollRef} className="flex-1 pr-4">
           <div className="space-y-4">
@@ -94,7 +94,7 @@ const Chat = () => {
           <Textarea
             value={input}
             onChange={(e) => setInput(e.target.value)}
-            placeholder="Type your message..."
+            placeholder="Escribe tu mensaje..."
             className="resize-none"
             onKeyDown={(e) => {
               if (e.key === "Enter" && !e.shiftKey) {

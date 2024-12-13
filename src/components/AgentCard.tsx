@@ -37,19 +37,19 @@ const AgentCard = ({ name, description, traits, interactions, onSelect }: AgentC
       <div className="flex justify-between items-center">
         <div className="flex items-center gap-2 text-sm text-muted-foreground">
           <MessageSquare className="h-4 w-4" />
-          <span>{interactions} interactions</span>
+          <span>{interactions} interacciones</span>
         </div>
         <div className="flex gap-2">
           <Button onClick={onSelect} variant="outline" className="gap-2">
             <Activity className="h-4 w-4" />
-            View Insights
+            Ver Estadísticas
           </Button>
           <Button 
             onClick={() => navigate(`/chat?agent=${encodeURIComponent(name)}`)}
             className="gap-2"
           >
             <MessageSquare className="h-4 w-4" />
-            Chat
+            Chatear
           </Button>
         </div>
       </div>
