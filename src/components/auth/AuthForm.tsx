@@ -44,7 +44,9 @@ export const AuthForm = () => {
           },
         },
       }}
-      providers={[]}
+      providers={["email"]}
+      view="sign_in"
+      showLinks={true}
       redirectTo={window.location.origin}
       localization={{
         variables: {
