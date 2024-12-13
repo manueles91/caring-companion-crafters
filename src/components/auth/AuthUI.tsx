@@ -28,43 +28,27 @@ const AuthUI = () => {
         });
         navigate('/');
       } else if (event === 'SIGNED_OUT') {
-        // Handle sign out event
         toast({
           title: "Signed Out",
           description: "You have been signed out.",
         });
+      } else if (event === 'USER_UPDATED') {
+        console.log('User updated:', session);
+      } else if (event === 'PASSWORD_RECOVERY') {
+        toast({
+          title: "Password Recovery",
+          description: "Please check your email for password reset instructions.",
+        });
+      } else if (event === 'USER_DELETED') {
+        toast({
+          title: "Account Deleted",
+          description: "Your account has been successfully deleted.",
+        });
       }
     });
 
-    // Handle auth errors
-    const handleAuthError = (error: any) => {
-      if (error.message?.includes('Invalid login credentials')) {
-        toast({
-          title: "Sign In Failed",
-          description: "Incorrect email or password. Please try again.",
-          variant: "destructive",
-        });
-      } else if (error.message?.includes('Email not confirmed')) {
-        toast({
-          title: "Email Not Verified",
-          description: "Please check your email and verify your account.",
-          variant: "destructive",
-        });
-      } else {
-        toast({
-          title: "Error",
-          description: error.message || "An error occurred during authentication.",
-          variant: "destructive",
-        });
-      }
-    };
-
-    // Subscribe to auth error events
-    const authErrorSubscription = supabase.auth.onError(handleAuthError);
-
     return () => {
       subscription.unsubscribe();
-      authErrorSubscription.unsubscribe();
     };
   }, [navigate, toast]);
 
