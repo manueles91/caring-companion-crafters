@@ -1,8 +1,7 @@
 import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { useToast } from "@/components/ui/use-toast";
+import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
-import { AuthError, Session } from "@supabase/supabase-js";
 
 export const useAuthState = () => {
   const { toast } = useToast();
@@ -51,6 +50,31 @@ export const useAuthState = () => {
           break;
         case 'INITIAL_SESSION':
           console.log('Initial session loaded');
+          break;
+        case 'USER_DELETED':
+          toast({
+            title: "Account Deleted",
+            description: "Your account has been successfully deleted.",
+          });
+          break;
+        case 'SIGNED_UP':
+          toast({
+            title: "Account Created",
+            description: "Your account has been successfully created.",
+          });
+          break;
+        case 'PASSWORD_RESET':
+          toast({
+            title: "Password Reset",
+            description: "Your password has been successfully reset.",
+          });
+          break;
+        case 'AUTH_ERROR':
+          toast({
+            title: "Authentication Error",
+            description: "There was an error with your authentication request. Please try again.",
+            variant: "destructive",
+          });
           break;
       }
     });
