@@ -70,6 +70,7 @@ const AuthUI = () => {
               loading_button_label: 'Signing in...',
               social_provider_text: 'Sign in with {{provider}}',
               link_text: 'Already have an account? Sign in',
+              error_message: 'Invalid login credentials. Please check your email and password.',
             },
             forgotten_password: {
               link_text: 'Forgot password?',
