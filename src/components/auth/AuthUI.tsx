@@ -27,6 +27,12 @@ const AuthUI = () => {
           description: "Successfully signed in.",
         });
         navigate('/');
+      } else if (event === 'USER_DELETED') {
+        toast({
+          title: "Error",
+          description: "Authentication failed. Please try again.",
+          variant: "destructive",
+        });
       }
     });
 
@@ -34,6 +40,15 @@ const AuthUI = () => {
       subscription.unsubscribe();
     };
   }, [navigate, toast]);
+
+  const handleError = (error: Error) => {
+    console.error('Auth error:', error);
+    toast({
+      title: "Authentication Error",
+      description: "Invalid credentials. Please check your email and password.",
+      variant: "destructive",
+    });
+  };
 
   return (
     <div className="max-w-md w-full mx-auto p-6">
@@ -56,6 +71,7 @@ const AuthUI = () => {
         }}
         providers={[]}
         redirectTo={window.location.origin}
+        onError={handleError}
         localization={{
           variables: {
             sign_in: {
