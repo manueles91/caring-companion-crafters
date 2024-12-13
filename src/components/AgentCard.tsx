@@ -6,6 +6,7 @@ import { MoreHorizontal, MessageSquare, Activity } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
 interface AgentCardProps {
+  id: string;
   name: string;
   description: string;
   traits: string[];
@@ -13,7 +14,7 @@ interface AgentCardProps {
   onSelect: () => void;
 }
 
-const AgentCard = ({ name, description, traits, interactions, onSelect }: AgentCardProps) => {
+const AgentCard = ({ id, name, description, traits, interactions, onSelect }: AgentCardProps) => {
   const navigate = useNavigate();
 
   return (
@@ -45,7 +46,7 @@ const AgentCard = ({ name, description, traits, interactions, onSelect }: AgentC
             Ver Estadísticas
           </Button>
           <Button 
-            onClick={() => navigate(`/chat?agent=${encodeURIComponent(name)}`)}
+            onClick={() => navigate(`/chat?agent=${id}`)}
             className="gap-2"
           >
             <MessageSquare className="h-4 w-4" />
