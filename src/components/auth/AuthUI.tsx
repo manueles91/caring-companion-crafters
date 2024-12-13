@@ -24,11 +24,6 @@ const AuthUI = () => {
           title: "Profile updated",
           description: "Your profile has been updated successfully.",
         });
-      } else if (event === 'USER_DELETED') {
-        toast({
-          title: "Account deleted",
-          description: "Your account has been deleted successfully.",
-        });
       }
     });
 
