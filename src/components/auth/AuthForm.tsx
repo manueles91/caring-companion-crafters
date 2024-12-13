@@ -22,12 +22,6 @@ export const AuthForm = () => {
           title: "Signed out",
           description: "You have been signed out successfully.",
         });
-      } else if (event === "USER_ERROR") {
-        toast({
-          title: "Authentication Error",
-          description: "An error occurred during authentication.",
-          variant: "destructive",
-        });
       }
     });
 
