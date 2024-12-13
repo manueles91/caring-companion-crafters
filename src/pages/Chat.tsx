@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { useSearchParams } from "react-router-dom";
+import { useSearchParams, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -21,8 +21,14 @@ interface Agent {
   traits: string[] | null;
 }
 
+const isValidUUID = (uuid: string) => {
+  const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+  return uuidRegex.test(uuid);
+};
+
 const Chat = () => {
   const [searchParams] = useSearchParams();
+  const navigate = useNavigate();
   const agentId = searchParams.get("agent");
   const [agent, setAgent] = useState<Agent | null>(null);
   const [messages, setMessages] = useState<Message[]>([]);
@@ -33,7 +39,25 @@ const Chat = () => {
 
   useEffect(() => {
     const fetchAgent = async () => {
-      if (!agentId) return;
+      if (!agentId) {
+        toast({
+          title: "Error",
+          description: "No se especificó ningún agente",
+          variant: "destructive",
+        });
+        navigate("/");
+        return;
+      }
+
+      if (!isValidUUID(agentId)) {
+        toast({
+          title: "Error",
+          description: "ID de agente inválido",
+          variant: "destructive",
+        });
+        navigate("/");
+        return;
+      }
 
       try {
         const { data, error } = await supabase
@@ -51,11 +75,12 @@ const Chat = () => {
           description: "No se pudo cargar la información del agente",
           variant: "destructive",
         });
+        navigate("/");
       }
     };
 
     fetchAgent();
-  }, [agentId, toast]);
+  }, [agentId, toast, navigate]);
 
   const handleSend = async () => {
     if (!input.trim() || !agent) return;
