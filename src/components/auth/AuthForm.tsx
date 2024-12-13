@@ -30,7 +30,7 @@ export const AuthForm = () => {
     };
   }, [toast]);
 
-  const providers = ['email'] as const satisfies readonly Provider[];
+  const providers: Provider[] = ["email" as Provider];
 
   return (
     <Auth
