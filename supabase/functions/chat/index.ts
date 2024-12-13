@@ -15,6 +15,12 @@ serve(async (req) => {
 
   try {
     const { messages, agentName } = await req.json();
+    console.log('Processing chat request for agent:', agentName);
+    console.log('Messages:', JSON.stringify(messages));
+
+    if (!openAIApiKey) {
+      throw new Error('OpenAI API key is not configured');
+    }
 
     // Add system message based on agent name
     const systemMessage = {
@@ -22,20 +28,37 @@ serve(async (req) => {
       content: `You are ${agentName}, an AI assistant designed to help with care and education. Always maintain a friendly, supportive, and age-appropriate tone.`
     };
 
+    const openAIRequest = {
+      model: 'gpt-4o-mini',
+      messages: [systemMessage, ...messages],
+      temperature: 0.7,
+    };
+
+    console.log('Sending request to OpenAI:', JSON.stringify(openAIRequest));
+
     const response = await fetch('https://api.openai.com/v1/chat/completions', {
       method: 'POST',
       headers: {
         'Authorization': `Bearer ${openAIApiKey}`,
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({
-        model: 'gpt-4o-mini',
-        messages: [systemMessage, ...messages],
-        temperature: 0.7,
-      }),
+      body: JSON.stringify(openAIRequest),
     });
 
+    if (!response.ok) {
+      const errorData = await response.text();
+      console.error('OpenAI API error:', errorData);
+      throw new Error(`OpenAI API error: ${response.status} ${errorData}`);
+    }
+
     const data = await response.json();
+    console.log('OpenAI API response:', JSON.stringify(data));
+
+    if (!data.choices || !data.choices[0] || !data.choices[0].message) {
+      console.error('Unexpected API response format:', data);
+      throw new Error('Invalid response format from OpenAI API');
+    }
+
     return new Response(JSON.stringify({ 
       message: data.choices[0].message.content 
     }), {
@@ -43,7 +66,9 @@ serve(async (req) => {
     });
   } catch (error) {
     console.error('Error in chat function:', error);
-    return new Response(JSON.stringify({ error: error.message }), {
+    return new Response(JSON.stringify({ 
+      error: error.message || 'An unexpected error occurred'
+    }), {
       status: 500,
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
     });
