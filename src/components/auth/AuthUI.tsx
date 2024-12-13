@@ -3,9 +3,11 @@ import { ThemeSupa } from "@supabase/auth-ui-shared";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/components/ui/use-toast";
 import { useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 
 const AuthUI = () => {
   const { toast } = useToast();
+  const navigate = useNavigate();
 
   useEffect(() => {
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
@@ -14,6 +16,7 @@ const AuthUI = () => {
           title: "Welcome back!",
           description: "You have successfully signed in.",
         });
+        navigate('/');
       } else if (event === 'SIGNED_OUT') {
         toast({
           title: "Signed out",
@@ -27,10 +30,17 @@ const AuthUI = () => {
       }
     });
 
+    // Check if user is already signed in
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      if (session) {
+        navigate('/');
+      }
+    });
+
     return () => {
       subscription.unsubscribe();
     };
-  }, [toast]);
+  }, [toast, navigate]);
 
   return (
     <div className="max-w-md w-full mx-auto p-6">
@@ -52,7 +62,14 @@ const AuthUI = () => {
           },
         }}
         providers={[]}
-        view="sign_up"
+        redirectTo={window.location.origin}
+        onError={(error) => {
+          toast({
+            title: "Authentication Error",
+            description: error.message,
+            variant: "destructive",
+          });
+        }}
         localization={{
           variables: {
             sign_up: {
