@@ -82,18 +82,40 @@ const Chat = () => {
     fetchAgent();
   }, [agentId, toast, navigate]);
 
+  const storeMessage = async (message: Message) => {
+    if (!agent) return;
+    
+    try {
+      const { error } = await supabase
+        .from('messages')
+        .insert({
+          agent_id: agent.id,
+          role: message.role,
+          content: message.content,
+        });
+
+      if (error) throw error;
+    } catch (error) {
+      console.error('Error al guardar el mensaje:', error);
+      // We don't show this error to the user as it's not critical for the chat experience
+    }
+  };
+
   const handleSend = async () => {
     if (!input.trim() || !agent) return;
 
-    const newMessage: Message = { role: "user", content: input };
-    setMessages((prev) => [...prev, newMessage]);
+    const userMessage: Message = { role: "user", content: input };
+    setMessages((prev) => [...prev, userMessage]);
     setInput("");
     setIsLoading(true);
 
     try {
+      // Store user message
+      await storeMessage(userMessage);
+
       const { data, error } = await supabase.functions.invoke('chat', {
         body: {
-          messages: [...messages, newMessage],
+          messages: [...messages, userMessage],
           agent: {
             name: agent.name,
             description: agent.description,
@@ -105,10 +127,15 @@ const Chat = () => {
 
       if (error) throw error;
 
-      setMessages((prev) => [...prev, { 
+      const assistantMessage: Message = { 
         role: "assistant", 
         content: data.message 
-      }]);
+      };
+
+      // Store assistant message
+      await storeMessage(assistantMessage);
+      
+      setMessages((prev) => [...prev, assistantMessage]);
     } catch (error) {
       console.error('Error en el chat:', error);
       toast({
