@@ -89,14 +89,36 @@ const AuthUI = () => {
               password_label: 'Password',
               button_label: 'Sign in',
               loading_button_label: 'Signing in...',
+              email_input_placeholder: 'Your email address',
+              password_input_placeholder: 'Your password',
+              link_text: 'Already have an account? Sign in',
             },
             sign_up: {
               email_label: 'Email address',
               password_label: 'Create a password (minimum 6 characters)',
               button_label: 'Sign up',
               loading_button_label: 'Creating account...',
+              email_input_placeholder: 'Your email address',
+              password_input_placeholder: 'Your password',
+              link_text: "Don't have an account? Sign up",
             },
           },
+        }}
+        onError={(error) => {
+          console.error('Auth error:', error);
+          if (error.message.includes('Invalid login credentials')) {
+            toast({
+              title: "Error",
+              description: "Invalid email or password. Please try again.",
+              variant: "destructive",
+            });
+          } else {
+            toast({
+              title: "Error",
+              description: "An error occurred. Please try again.",
+              variant: "destructive",
+            });
+          }
         }}
         theme="light"
       />
