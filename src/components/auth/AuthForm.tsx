@@ -22,6 +22,12 @@ export const AuthForm = () => {
           title: "Signed out",
           description: "You have been signed out successfully.",
         });
+      } else if (event === "USER_ERROR") {
+        toast({
+          title: "Authentication Error",
+          description: "An error occurred during authentication.",
+          variant: "destructive",
+        });
       }
     });
 
@@ -46,13 +52,6 @@ export const AuthForm = () => {
       }}
       providers={[]}
       redirectTo={window.location.origin}
-      onError={(error: AuthError) => {
-        toast({
-          title: "Authentication Error",
-          description: error.message,
-          variant: "destructive",
-        });
-      }}
       localization={{
         variables: {
           sign_in: {
