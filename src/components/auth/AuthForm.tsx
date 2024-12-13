@@ -31,27 +31,18 @@ export const AuthForm = () => {
           title: "Profile Updated",
           description: "Your profile has been updated successfully.",
         });
-      } else if (event === "USER_DELETED") {
+      } else if (event === "INITIAL_SESSION" && !session) {
+        // Handle authentication errors through session state
         toast({
-          title: "Account Deleted",
-          description: "Your account has been deleted successfully.",
+          title: "Authentication Error",
+          description: "Please check your credentials and try again.",
           variant: "destructive",
         });
       }
     });
 
-    // Listen for auth errors
-    const authListener = supabase.auth.onError((error) => {
-      toast({
-        title: "Authentication Error",
-        description: error.message,
-        variant: "destructive",
-      });
-    });
-
     return () => {
       subscription.unsubscribe();
-      authListener.data.subscription.unsubscribe();
     };
   }, [toast]);
 
