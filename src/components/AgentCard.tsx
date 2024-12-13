@@ -4,18 +4,33 @@ import { Badge } from "./ui/badge";
 import { Button } from "./ui/button";
 import { MoreHorizontal, MessageSquare, Activity } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { useQuery } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
 
 interface AgentCardProps {
   id: string;
   name: string;
   description: string;
   traits: string[];
-  interactions: number;
   onSelect: () => void;
 }
 
-const AgentCard = ({ id, name, description, traits, interactions, onSelect }: AgentCardProps) => {
+const AgentCard = ({ id, name, description, traits, onSelect }: AgentCardProps) => {
   const navigate = useNavigate();
+
+  const { data: interactionCount = 0 } = useQuery({
+    queryKey: ['interactions', id],
+    queryFn: async () => {
+      const { count, error } = await supabase
+        .from('messages')
+        .select('*', { count: 'exact', head: true })
+        .eq('agent_id', id)
+        .eq('role', 'user');
+      
+      if (error) throw error;
+      return count || 0;
+    },
+  });
 
   return (
     <Card className="p-6 hover:shadow-lg transition-all duration-300 animate-fade-in">
@@ -38,7 +53,7 @@ const AgentCard = ({ id, name, description, traits, interactions, onSelect }: Ag
       <div className="flex justify-between items-center">
         <div className="flex items-center gap-2 text-sm text-muted-foreground">
           <MessageSquare className="h-4 w-4" />
-          <span>{interactions} interacciones</span>
+          <span>{interactionCount}</span>
         </div>
         <div className="flex gap-2">
           <Button onClick={onSelect} variant="outline" className="gap-2">

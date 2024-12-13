@@ -7,19 +7,8 @@ import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/components/ui/use-toast";
 import { Send } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
-
-interface Message {
-  role: "user" | "assistant";
-  content: string;
-}
-
-interface Agent {
-  id: string;
-  name: string;
-  description: string;
-  instructions: string | null;
-  traits: string[] | null;
-}
+import ChatMessage from "@/components/chat/ChatMessage";
+import { Message, Agent } from "@/types/chat";
 
 const isValidUUID = (uuid: string) => {
   const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
@@ -60,19 +49,29 @@ const Chat = () => {
       }
 
       try {
-        const { data, error } = await supabase
+        const { data: agentData, error: agentError } = await supabase
           .from('agents')
           .select()
           .eq('id', agentId)
           .single();
 
-        if (error) throw error;
-        setAgent(data);
+        if (agentError) throw agentError;
+        setAgent(agentData);
+
+        // Fetch previous messages
+        const { data: messagesData, error: messagesError } = await supabase
+          .from('messages')
+          .select('role, content')
+          .eq('agent_id', agentId)
+          .order('created_at', { ascending: true });
+
+        if (messagesError) throw messagesError;
+        setMessages(messagesData);
       } catch (error) {
-        console.error('Error al cargar el agente:', error);
+        console.error('Error al cargar datos:', error);
         toast({
           title: "Error",
-          description: "No se pudo cargar la información del agente",
+          description: "No se pudieron cargar los datos",
           variant: "destructive",
         });
         navigate("/");
@@ -170,22 +169,7 @@ const Chat = () => {
         <ScrollArea ref={scrollRef} className="flex-1 pr-4">
           <div className="space-y-4">
             {messages.map((message, index) => (
-              <div
-                key={index}
-                className={`flex ${
-                  message.role === "user" ? "justify-end" : "justify-start"
-                }`}
-              >
-                <div
-                  className={`max-w-[80%] p-3 rounded-lg ${
-                    message.role === "user"
-                      ? "bg-primary text-primary-foreground ml-4"
-                      : "bg-muted"
-                  }`}
-                >
-                  {message.content}
-                </div>
-              </div>
+              <ChatMessage key={index} message={message} />
             ))}
           </div>
         </ScrollArea>
