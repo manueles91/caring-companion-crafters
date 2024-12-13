@@ -47,7 +47,10 @@ const Index = () => {
         return;
       }
       
-      setUserRole(data.role);
+      // Ensure the role is of the correct type before setting it
+      if (data.role === 'user' || data.role === 'creator') {
+        setUserRole(data.role);
+      }
     };
 
     fetchUserRole();
