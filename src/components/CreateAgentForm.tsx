@@ -52,6 +52,10 @@ const CreateAgentForm = () => {
     setIsSubmitting(true);
 
     try {
+      const { data: { user } } = await supabase.auth.getUser();
+      
+      if (!user) throw new Error("No user found");
+
       const { data: agent, error } = await supabase
         .from('agents')
         .insert({
@@ -59,6 +63,7 @@ const CreateAgentForm = () => {
           description,
           instructions: instructions || null,
           traits: selectedTraits,
+          creator_id: user.id,
         })
         .select()
         .single();
@@ -70,8 +75,7 @@ const CreateAgentForm = () => {
         description: "Agente creado correctamente",
       });
 
-      // Navigate to chat with the new agent's ID
-      navigate(`/chat?agent=${encodeURIComponent(agent.id)}`);
+      navigate(`/chat?agent=${agent.id}`);
     } catch (error) {
       console.error('Error al crear el agente:', error);
       toast({

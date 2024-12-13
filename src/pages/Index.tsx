@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Plus } from "lucide-react";
 import AgentCard from "@/components/AgentCard";
@@ -6,9 +6,52 @@ import CreateAgentForm from "@/components/CreateAgentForm";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Skeleton } from "@/components/ui/skeleton";
+import AuthUI from "@/components/auth/AuthUI";
+import { useToast } from "@/components/ui/use-toast";
 
 const Index = () => {
   const [showCreateForm, setShowCreateForm] = React.useState(false);
+  const [session, setSession] = React.useState(null);
+  const [userRole, setUserRole] = React.useState<'user' | 'creator' | null>(null);
+  const { toast } = useToast();
+
+  useEffect(() => {
+    // Check current session
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setSession(session);
+    });
+
+    // Listen for auth changes
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((_event, session) => {
+      setSession(session);
+    });
+
+    return () => subscription.unsubscribe();
+  }, []);
+
+  // Fetch user role when session changes
+  useEffect(() => {
+    const fetchUserRole = async () => {
+      if (!session?.user?.id) return;
+      
+      const { data, error } = await supabase
+        .from('profiles')
+        .select('role')
+        .eq('id', session.user.id)
+        .single();
+      
+      if (error) {
+        console.error('Error fetching user role:', error);
+        return;
+      }
+      
+      setUserRole(data.role);
+    };
+
+    fetchUserRole();
+  }, [session]);
 
   const { data: agents, isLoading } = useQuery({
     queryKey: ['agents'],
@@ -21,6 +64,7 @@ const Index = () => {
       if (error) throw error;
       return data;
     },
+    enabled: !!session, // Only fetch if user is authenticated
   });
 
   const renderAgentCards = () => {
@@ -36,11 +80,17 @@ const Index = () => {
       return (
         <div className="col-span-full text-center py-12">
           <h3 className="text-lg font-semibold mb-2">No hay agentes</h3>
-          <p className="text-muted-foreground mb-4">Crea tu primer agente IA para comenzar</p>
-          <Button onClick={() => setShowCreateForm(true)} className="gap-2">
-            <Plus className="h-4 w-4" />
-            Crear Agente
-          </Button>
+          <p className="text-muted-foreground mb-4">
+            {userRole === 'creator' 
+              ? 'Crea tu primer agente IA para comenzar'
+              : 'No hay agentes disponibles en este momento'}
+          </p>
+          {userRole === 'creator' && (
+            <Button onClick={() => setShowCreateForm(true)} className="gap-2">
+              <Plus className="h-4 w-4" />
+              Crear Agente
+            </Button>
+          )}
         </div>
       );
     }
@@ -57,15 +107,23 @@ const Index = () => {
     ));
   };
 
+  if (!session) {
+    return <AuthUI />;
+  }
+
   return (
     <div className="min-h-screen bg-background">
       <div className="container mx-auto px-4 py-8">
         <div className="flex justify-between items-center mb-8">
           <div>
             <h1 className="text-4xl font-bold mb-2">Agentes IA</h1>
-            <p className="text-muted-foreground">Crea y gestiona tus asistentes IA</p>
+            <p className="text-muted-foreground">
+              {userRole === 'creator' 
+                ? 'Crea y gestiona tus asistentes IA'
+                : 'Chatea con asistentes IA'}
+            </p>
           </div>
-          {!showCreateForm && (
+          {userRole === 'creator' && !showCreateForm && (
             <Button onClick={() => setShowCreateForm(true)} className="gap-2">
               <Plus className="h-4 w-4" />
               Nuevo Agente

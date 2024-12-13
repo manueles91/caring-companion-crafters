@@ -12,6 +12,7 @@ export type Database = {
       agents: {
         Row: {
           created_at: string | null
+          creator_id: string | null
           description: string
           id: string
           instructions: string | null
@@ -21,6 +22,7 @@ export type Database = {
         }
         Insert: {
           created_at?: string | null
+          creator_id?: string | null
           description: string
           id?: string
           instructions?: string | null
@@ -30,6 +32,7 @@ export type Database = {
         }
         Update: {
           created_at?: string | null
+          creator_id?: string | null
           description?: string
           id?: string
           instructions?: string | null
@@ -37,7 +40,15 @@ export type Database = {
           traits?: string[] | null
           updated_at?: string | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "agents_creator_id_fkey"
+            columns: ["creator_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       messages: {
         Row: {
@@ -83,6 +94,27 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      profiles: {
+        Row: {
+          created_at: string | null
+          id: string
+          role: string
+          username: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          id: string
+          role?: string
+          username?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          role?: string
+          username?: string | null
+        }
+        Relationships: []
       }
     }
     Views: {
