@@ -8,14 +8,16 @@ import Index from "./pages/Index";
 import Chat from "./pages/Chat";
 import AuthUI from "./components/auth/AuthUI";
 
-if (!import.meta.env.VITE_CLERK_PUBLISHABLE_KEY) {
-  throw new Error("Missing Clerk Publishable Key");
+const publishableKey = import.meta.env.VITE_CLERK_PUBLISHABLE_KEY;
+
+if (!publishableKey) {
+  console.error("Missing Clerk Publishable Key - Please add VITE_CLERK_PUBLISHABLE_KEY to your environment variables");
 }
 
 const queryClient = new QueryClient();
 
 const App = () => (
-  <ClerkProvider publishableKey={import.meta.env.VITE_CLERK_PUBLISHABLE_KEY}>
+  <ClerkProvider publishableKey={publishableKey || "pk_test_placeholder"}>
     <QueryClientProvider client={queryClient}>
       <TooltipProvider>
         <Toaster />
