@@ -21,6 +21,16 @@ export const AuthForm = () => {
           title: "Signed out",
           description: "You have been signed out successfully.",
         });
+      } else if (event === "PASSWORD_RECOVERY") {
+        toast({
+          title: "Password Recovery",
+          description: "Check your email for password reset instructions.",
+        });
+      } else if (event === "USER_UPDATED") {
+        toast({
+          title: "Profile Updated",
+          description: "Your profile has been updated successfully.",
+        });
       }
     });
 
@@ -46,6 +56,13 @@ export const AuthForm = () => {
       view="sign_in"
       showLinks={true}
       redirectTo={window.location.origin}
+      onError={(error) => {
+        toast({
+          title: "Authentication Error",
+          description: error.message,
+          variant: "destructive",
+        });
+      }}
       localization={{
         variables: {
           sign_in: {
@@ -74,7 +91,6 @@ export const AuthForm = () => {
           },
         },
       }}
-      theme="light"
     />
   );
 };
