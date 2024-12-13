@@ -5,6 +5,8 @@ import { Button } from "./ui/button";
 import { Textarea } from "./ui/textarea";
 import { Badge } from "./ui/badge";
 import { Plus, X } from "lucide-react";
+import { useToast } from "./ui/use-toast";
+import { useNavigate } from "react-router-dom";
 
 const PERSONALITY_TRAITS = [
   "Amigable",
@@ -19,6 +21,12 @@ const PERSONALITY_TRAITS = [
 
 const CreateAgentForm = () => {
   const [selectedTraits, setSelectedTraits] = React.useState<string[]>([]);
+  const [name, setName] = React.useState("");
+  const [description, setDescription] = React.useState("");
+  const [instructions, setInstructions] = React.useState("");
+  const [isSubmitting, setIsSubmitting] = React.useState(false);
+  const { toast } = useToast();
+  const navigate = useNavigate();
 
   const toggleTrait = (trait: string) => {
     if (selectedTraits.includes(trait)) {
@@ -28,22 +36,67 @@ const CreateAgentForm = () => {
     }
   };
 
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    if (!name.trim() || !description.trim()) {
+      toast({
+        title: "Error",
+        description: "Por favor completa los campos requeridos",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setIsSubmitting(true);
+
+    try {
+      // Here we would typically make an API call to create the agent
+      // For now, we'll simulate success
+      await new Promise(resolve => setTimeout(resolve, 1000));
+
+      toast({
+        title: "¡Éxito!",
+        description: "Agente creado correctamente",
+      });
+
+      // Navigate to chat with the new agent
+      navigate(`/chat?agent=${encodeURIComponent(name)}`);
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "No se pudo crear el agente. Por favor intenta de nuevo.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
   return (
     <Card className="p-6 max-w-2xl mx-auto animate-fade-in">
       <h2 className="text-2xl font-semibold mb-6">Crear Nuevo Agente IA</h2>
       
-      <div className="space-y-6">
+      <form onSubmit={handleSubmit} className="space-y-6">
         <div>
-          <label className="text-sm font-medium mb-2 block">Nombre del Agente</label>
-          <Input placeholder="Ingresa el nombre del agente..." />
+          <label className="text-sm font-medium mb-2 block">Nombre del Agente *</label>
+          <Input 
+            placeholder="Ingresa el nombre del agente..." 
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            required
+          />
         </div>
 
         <div>
-          <label className="text-sm font-medium mb-2 block">Descripción</label>
+          <label className="text-sm font-medium mb-2 block">Descripción *</label>
           <Textarea 
             placeholder="Describe el propósito de tu agente..."
             className="resize-none"
             rows={4}
+            value={description}
+            onChange={(e) => setDescription(e.target.value)}
+            required
           />
         </div>
 
@@ -74,13 +127,19 @@ const CreateAgentForm = () => {
             placeholder="Proporciona instrucciones iniciales para tu agente..."
             className="resize-none"
             rows={6}
+            value={instructions}
+            onChange={(e) => setInstructions(e.target.value)}
           />
         </div>
 
-        <Button className="w-full">
-          Crear Agente
+        <Button 
+          type="submit" 
+          className="w-full"
+          disabled={isSubmitting}
+        >
+          {isSubmitting ? "Creando..." : "Crear Agente"}
         </Button>
-      </div>
+      </form>
     </Card>
   );
 };
