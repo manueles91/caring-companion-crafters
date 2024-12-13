@@ -3,7 +3,7 @@ import { ThemeSupa } from "@supabase/auth-ui-shared";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { useEffect } from "react";
-import { AuthError } from "@supabase/supabase-js";
+import { Provider } from "@supabase/supabase-js";
 
 export const AuthForm = () => {
   const { toast } = useToast();
@@ -44,7 +44,7 @@ export const AuthForm = () => {
           },
         },
       }}
-      providers={["email"]}
+      providers={["email"] as Provider[]}
       view="sign_in"
       showLinks={true}
       redirectTo={window.location.origin}
