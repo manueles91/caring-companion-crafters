@@ -3,7 +3,7 @@ import { ThemeSupa } from "@supabase/auth-ui-shared";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { useEffect } from "react";
-import { AuthChangeEvent } from "@supabase/supabase-js";
+import { AuthError } from "@supabase/supabase-js";
 
 export const AuthForm = () => {
   const { toast } = useToast();
@@ -11,8 +11,18 @@ export const AuthForm = () => {
   useEffect(() => {
     const {
       data: { subscription },
-    } = supabase.auth.onAuthStateChange((event: AuthChangeEvent) => {
-      if (event === "USER_DELETED") {
+    } = supabase.auth.onAuthStateChange(async (event, session) => {
+      if (event === "SIGNED_IN") {
+        toast({
+          title: "Welcome back!",
+          description: "Successfully signed in.",
+        });
+      } else if (event === "SIGNED_OUT") {
+        toast({
+          title: "Signed out",
+          description: "You have been signed out successfully.",
+        });
+      } else if (event === "USER_DELETED") {
         toast({
           title: "Account deleted",
           description: "Your account has been successfully deleted.",
@@ -41,6 +51,13 @@ export const AuthForm = () => {
       }}
       providers={[]}
       redirectTo={window.location.origin}
+      onError={(error: AuthError) => {
+        toast({
+          title: "Authentication Error",
+          description: error.message,
+          variant: "destructive",
+        });
+      }}
       localization={{
         variables: {
           sign_in: {
