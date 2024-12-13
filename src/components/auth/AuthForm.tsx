@@ -31,11 +31,27 @@ export const AuthForm = () => {
           title: "Profile Updated",
           description: "Your profile has been updated successfully.",
         });
+      } else if (event === "USER_DELETED") {
+        toast({
+          title: "Account Deleted",
+          description: "Your account has been deleted successfully.",
+          variant: "destructive",
+        });
       }
+    });
+
+    // Listen for auth errors
+    const authListener = supabase.auth.onError((error) => {
+      toast({
+        title: "Authentication Error",
+        description: error.message,
+        variant: "destructive",
+      });
     });
 
     return () => {
       subscription.unsubscribe();
+      authListener.data.subscription.unsubscribe();
     };
   }, [toast]);
 
@@ -56,13 +72,6 @@ export const AuthForm = () => {
       view="sign_in"
       showLinks={true}
       redirectTo={window.location.origin}
-      onError={(error) => {
-        toast({
-          title: "Authentication Error",
-          description: error.message,
-          variant: "destructive",
-        });
-      }}
       localization={{
         variables: {
           sign_in: {
