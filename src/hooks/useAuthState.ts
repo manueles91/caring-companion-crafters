@@ -48,9 +48,6 @@ export const useAuthState = () => {
             description: "Please check your email for password reset instructions.",
           });
           break;
-        case "USER_DELETED":
-          navigate('/auth');
-          break;
       }
     });
 

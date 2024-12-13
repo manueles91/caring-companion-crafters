@@ -3,7 +3,7 @@ import { ThemeSupa } from "@supabase/auth-ui-shared";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { useEffect } from "react";
-import { AuthError } from "@supabase/supabase-js";
+import { AuthError, AuthResponse } from "@supabase/supabase-js";
 
 export const AuthForm = () => {
   const { toast } = useToast();
@@ -22,11 +22,6 @@ export const AuthForm = () => {
           title: "Signed out",
           description: "You have been signed out successfully.",
         });
-      } else if (event === "USER_DELETED") {
-        toast({
-          title: "Account deleted",
-          description: "Your account has been successfully deleted.",
-        });
       }
     });
 
@@ -34,6 +29,14 @@ export const AuthForm = () => {
       subscription.unsubscribe();
     };
   }, [toast]);
+
+  const handleError = (error: AuthError) => {
+    toast({
+      title: "Authentication Error",
+      description: error.message,
+      variant: "destructive",
+    });
+  };
 
   return (
     <Auth
@@ -51,13 +54,7 @@ export const AuthForm = () => {
       }}
       providers={[]}
       redirectTo={window.location.origin}
-      onError={(error: AuthError) => {
-        toast({
-          title: "Authentication Error",
-          description: error.message,
-          variant: "destructive",
-        });
-      }}
+      onAuthError={handleError}
       localization={{
         variables: {
           sign_in: {
