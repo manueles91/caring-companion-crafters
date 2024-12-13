@@ -6,6 +6,7 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/components/ui/use-toast";
 import { Send } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
 
 interface Message {
   role: "user" | "assistant";
@@ -30,19 +31,21 @@ const Chat = () => {
     setIsLoading(true);
 
     try {
-      const response = await fetch("/api/chat", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
+      const { data, error } = await supabase.functions.invoke('chat', {
+        body: {
           messages: [...messages, newMessage],
-        }),
+          agentName,
+        },
       });
 
-      if (!response.ok) throw new Error("Failed to get response");
+      if (error) throw error;
 
-      const data = await response.json();
-      setMessages((prev) => [...prev, { role: "assistant", content: data.message }]);
+      setMessages((prev) => [...prev, { 
+        role: "assistant", 
+        content: data.message 
+      }]);
     } catch (error) {
+      console.error('Chat error:', error);
       toast({
         title: "Error",
         description: "Sorry, I couldn't send your message. Please try again.",
