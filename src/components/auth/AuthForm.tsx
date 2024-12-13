@@ -30,14 +30,6 @@ export const AuthForm = () => {
     };
   }, [toast]);
 
-  const handleError = (error: AuthError) => {
-    toast({
-      title: "Authentication Error",
-      description: error.message,
-      variant: "destructive",
-    });
-  };
-
   return (
     <Auth
       supabaseClient={supabase}
@@ -54,7 +46,15 @@ export const AuthForm = () => {
       }}
       providers={[]}
       redirectTo={window.location.origin}
-      onError={handleError}
+      onAuthEvent={(event) => {
+        if (event.error) {
+          toast({
+            title: "Authentication Error",
+            description: event.error.message,
+            variant: "destructive",
+          });
+        }
+      }}
       localization={{
         variables: {
           sign_in: {
