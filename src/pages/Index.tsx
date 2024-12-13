@@ -16,45 +16,59 @@ const Index = () => {
   const { toast } = useToast();
 
   useEffect(() => {
-    // Check current session
     supabase.auth.getSession().then(({ data: { session } }) => {
       setSession(session);
     });
 
-    // Listen for auth changes
     const {
       data: { subscription },
-    } = supabase.auth.onAuthStateChange((_event, session) => {
+    } = supabase.auth.onAuthStateChange(async (_event, session) => {
       setSession(session);
+      if (session?.user) {
+        // Check if profile exists
+        const { data: profile, error: profileError } = await supabase
+          .from('profiles')
+          .select('*')
+          .eq('id', session.user.id)
+          .single();
+
+        if (profileError) {
+          // If no profile exists, create one
+          if (profileError.code === 'PGRST116') {
+            const { error: insertError } = await supabase
+              .from('profiles')
+              .insert({
+                id: session.user.id,
+                username: session.user.email,
+                role: 'user'
+              });
+
+            if (insertError) {
+              console.error('Error creating profile:', insertError);
+              toast({
+                title: "Error",
+                description: "Could not create user profile",
+                variant: "destructive",
+              });
+            } else {
+              setUserRole('user');
+            }
+          } else {
+            console.error('Error fetching profile:', profileError);
+            toast({
+              title: "Error",
+              description: "Could not fetch user profile",
+              variant: "destructive",
+            });
+          }
+        } else if (profile) {
+          setUserRole(profile.role as 'user' | 'creator');
+        }
+      }
     });
 
     return () => subscription.unsubscribe();
-  }, []);
-
-  // Fetch user role when session changes
-  useEffect(() => {
-    const fetchUserRole = async () => {
-      if (!session?.user?.id) return;
-      
-      const { data, error } = await supabase
-        .from('profiles')
-        .select('role')
-        .eq('id', session.user.id)
-        .single();
-      
-      if (error) {
-        console.error('Error fetching user role:', error);
-        return;
-      }
-      
-      // Ensure the role is of the correct type before setting it
-      if (data.role === 'user' || data.role === 'creator') {
-        setUserRole(data.role);
-      }
-    };
-
-    fetchUserRole();
-  }, [session]);
+  }, [toast]);
 
   const { data: agents, isLoading } = useQuery({
     queryKey: ['agents'],
@@ -67,7 +81,7 @@ const Index = () => {
       if (error) throw error;
       return data;
     },
-    enabled: !!session, // Only fetch if user is authenticated
+    enabled: !!session,
   });
 
   const renderAgentCards = () => {
