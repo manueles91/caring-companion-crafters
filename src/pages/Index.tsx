@@ -18,6 +18,9 @@ const Index = () => {
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
       setSession(session);
+      if (session?.user) {
+        checkAndCreateProfile(session.user.id);
+      }
     });
 
     const {
@@ -25,56 +28,58 @@ const Index = () => {
     } = supabase.auth.onAuthStateChange(async (_event, session) => {
       setSession(session);
       if (session?.user) {
-        try {
-          // Try to get the profile first
-          const { data: profile, error: profileError } = await supabase
-            .from('profiles')
-            .select('*')
-            .eq('id', session.user.id)
-            .maybeSingle(); // Use maybeSingle() instead of single() to avoid 406 error
-
-          if (!profile && (!profileError || profileError.code === 'PGRST116')) {
-            // Profile doesn't exist, create it
-            const { data: newProfile, error: insertError } = await supabase
-              .from('profiles')
-              .upsert({
-                id: session.user.id,
-                username: session.user.email,
-                role: 'user'
-              })
-              .select()
-              .single();
-
-            if (insertError) {
-              console.error('Error creating profile:', insertError);
-              toast({
-                title: "Error",
-                description: "Could not create user profile",
-                variant: "destructive",
-              });
-            } else if (newProfile) {
-              setUserRole(newProfile.role as 'user' | 'creator');
-              toast({
-                title: "Success",
-                description: "Profile created successfully",
-              });
-            }
-          } else if (profile) {
-            setUserRole(profile.role as 'user' | 'creator');
-          }
-        } catch (error) {
-          console.error('Error handling profile:', error);
-          toast({
-            title: "Error",
-            description: "An error occurred while setting up your profile",
-            variant: "destructive",
-          });
-        }
+        checkAndCreateProfile(session.user.id);
       }
     });
 
     return () => subscription.unsubscribe();
-  }, [toast]);
+  }, []);
+
+  const checkAndCreateProfile = async (userId: string) => {
+    try {
+      const { data: profile, error } = await supabase
+        .from('profiles')
+        .select('*')
+        .eq('id', userId)
+        .maybeSingle();
+
+      if (!profile && (!error || error.code === 'PGRST116')) {
+        const { data: newProfile, error: insertError } = await supabase
+          .from('profiles')
+          .upsert({
+            id: userId,
+            username: session?.user?.email,
+            role: 'user'
+          })
+          .select()
+          .single();
+
+        if (insertError) {
+          console.error('Error creating profile:', insertError);
+          toast({
+            title: "Error",
+            description: "Could not create user profile",
+            variant: "destructive",
+          });
+        } else if (newProfile) {
+          setUserRole(newProfile.role as 'user' | 'creator');
+          toast({
+            title: "Success",
+            description: "Profile created successfully",
+          });
+        }
+      } else if (profile) {
+        setUserRole(profile.role as 'user' | 'creator');
+      }
+    } catch (error) {
+      console.error('Error handling profile:', error);
+      toast({
+        title: "Error",
+        description: "An error occurred while setting up your profile",
+        variant: "destructive",
+      });
+    }
+  };
 
   const { data: agents, isLoading } = useQuery({
     queryKey: ['agents'],
