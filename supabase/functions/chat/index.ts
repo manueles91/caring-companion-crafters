@@ -19,14 +19,23 @@ serve(async (req) => {
       throw new Error('OpenAI API key is not configured');
     }
 
-    const { messages, agentName } = await req.json();
-    console.log('Processing chat request for agent:', agentName);
+    const { messages, agent } = await req.json();
+    console.log('Processing chat request for agent:', agent.name);
+    console.log('Agent configuration:', JSON.stringify(agent));
     console.log('Messages:', JSON.stringify(messages));
 
-    // Add system message based on agent name
+    // Create a detailed system message based on agent configuration
     const systemMessage = {
       role: 'system',
-      content: `You are ${agentName}, an AI assistant designed to help with care and education. Always maintain a friendly, supportive, and age-appropriate tone.`
+      content: `You are ${agent.name}, an AI assistant with the following characteristics:
+
+Description: ${agent.description}
+
+${agent.traits?.length ? `Personality traits: ${agent.traits.join(', ')}` : ''}
+
+${agent.instructions ? `Special instructions: ${agent.instructions}` : ''}
+
+Maintain these characteristics throughout the conversation and respond in Spanish.`
     };
 
     const openAIRequest = {
@@ -51,7 +60,6 @@ serve(async (req) => {
       const errorData = await response.text();
       console.error('OpenAI API error:', errorData);
       
-      // Check if it's a quota error
       if (response.status === 429) {
         return new Response(
           JSON.stringify({ 

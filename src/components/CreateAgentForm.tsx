@@ -7,6 +7,7 @@ import { Badge } from "./ui/badge";
 import { Plus, X } from "lucide-react";
 import { useToast } from "./ui/use-toast";
 import { useNavigate } from "react-router-dom";
+import { supabase } from "@/integrations/supabase/client";
 
 const PERSONALITY_TRAITS = [
   "Amigable",
@@ -51,18 +52,28 @@ const CreateAgentForm = () => {
     setIsSubmitting(true);
 
     try {
-      // Here we would typically make an API call to create the agent
-      // For now, we'll simulate success
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      const { data: agent, error } = await supabase
+        .from('agents')
+        .insert({
+          name,
+          description,
+          instructions: instructions || null,
+          traits: selectedTraits,
+        })
+        .select()
+        .single();
+
+      if (error) throw error;
 
       toast({
         title: "¡Éxito!",
         description: "Agente creado correctamente",
       });
 
-      // Navigate to chat with the new agent
-      navigate(`/chat?agent=${encodeURIComponent(name)}`);
+      // Navigate to chat with the new agent's ID
+      navigate(`/chat?agent=${encodeURIComponent(agent.id)}`);
     } catch (error) {
+      console.error('Error al crear el agente:', error);
       toast({
         title: "Error",
         description: "No se pudo crear el agente. Por favor intenta de nuevo.",
