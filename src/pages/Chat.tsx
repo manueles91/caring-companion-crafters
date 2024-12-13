@@ -9,7 +9,10 @@ import { Send } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import ChatMessage from "@/components/chat/ChatMessage";
 import { Message, Agent } from "@/types/chat";
+import { useMessageStore } from "@/stores/messageStore";
+import { useAuthStore } from "@/stores/authStore";
 
+// Move isValidUUID to a separate utility file
 const isValidUUID = (uuid: string) => {
   const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
   return uuidRegex.test(uuid);
@@ -25,6 +28,23 @@ const Chat = () => {
   const [isLoading, setIsLoading] = useState(false);
   const { toast } = useToast();
   const scrollRef = React.useRef<HTMLDivElement>(null);
+
+  // Check authentication
+  useEffect(() => {
+    const checkAuth = async () => {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) {
+        toast({
+          title: "Error",
+          description: "Please log in to continue",
+          variant: "destructive",
+        });
+        navigate("/");
+        return;
+      }
+    };
+    checkAuth();
+  }, [navigate, toast]);
 
   useEffect(() => {
     const fetchAgent = async () => {
@@ -49,6 +69,9 @@ const Chat = () => {
       }
 
       try {
+        const { data: { session } } = await supabase.auth.getSession();
+        if (!session) throw new Error("No authenticated session");
+
         const { data: agentData, error: agentError } = await supabase
           .from('agents')
           .select()
@@ -58,16 +81,16 @@ const Chat = () => {
         if (agentError) throw agentError;
         setAgent(agentData);
 
-        // Fetch previous messages and properly type them
+        // Fetch previous messages for this user and agent
         const { data: messagesData, error: messagesError } = await supabase
           .from('messages')
           .select('role, content')
           .eq('agent_id', agentId)
+          .eq('user_id', session.user.id)
           .order('created_at', { ascending: true });
 
         if (messagesError) throw messagesError;
         
-        // Ensure the role is either "user" or "assistant"
         const typedMessages: Message[] = messagesData.map(msg => ({
           role: msg.role as "user" | "assistant",
           content: msg.content
@@ -92,18 +115,21 @@ const Chat = () => {
     if (!agent) return;
     
     try {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) throw new Error("No authenticated session");
+
       const { error } = await supabase
         .from('messages')
         .insert({
           agent_id: agent.id,
           role: message.role,
           content: message.content,
+          user_id: session.user.id
         });
 
       if (error) throw error;
     } catch (error) {
       console.error('Error al guardar el mensaje:', error);
-      // We don't show this error to the user as it's not critical for the chat experience
     }
   };
 
@@ -171,7 +197,7 @@ const Chat = () => {
   return (
     <div className="container mx-auto max-w-4xl p-4 h-screen flex flex-col">
       <Card className="flex-1 p-4 flex flex-col">
-        <h1 className="text-2xl font-bold mb-4">Chat con {agent.name}</h1>
+        <h1 className="text-2xl font-bold mb-4">Chat con {agent?.name}</h1>
         
         <ScrollArea ref={scrollRef} className="flex-1 pr-4">
           <div className="space-y-4">

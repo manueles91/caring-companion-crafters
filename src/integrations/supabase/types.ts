@@ -59,6 +59,7 @@ export type Database = {
           metadata: Json | null
           role: string
           tags: string[] | null
+          user_id: string | null
         }
         Insert: {
           agent_id: string
@@ -68,6 +69,7 @@ export type Database = {
           metadata?: Json | null
           role: string
           tags?: string[] | null
+          user_id?: string | null
         }
         Update: {
           agent_id?: string
@@ -77,6 +79,7 @@ export type Database = {
           metadata?: Json | null
           role?: string
           tags?: string[] | null
+          user_id?: string | null
         }
         Relationships: [
           {
@@ -91,6 +94,13 @@ export type Database = {
             columns: ["agent_id"]
             isOneToOne: false
             referencedRelation: "agents"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "messages_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
             referencedColumns: ["id"]
           },
         ]
