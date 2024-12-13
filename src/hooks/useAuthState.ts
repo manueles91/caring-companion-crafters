@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { AuthError } from "@supabase/supabase-js";
@@ -7,14 +7,21 @@ import { AuthError } from "@supabase/supabase-js";
 export const useAuthState = () => {
   const { toast } = useToast();
   const navigate = useNavigate();
+  const location = useLocation();
 
   useEffect(() => {
     const checkUser = async () => {
       try {
         const { data: { session }, error } = await supabase.auth.getSession();
         if (error) throw error;
-        if (session) {
+        
+        // If user is authenticated and trying to access auth page, redirect to home
+        if (session && location.pathname === '/auth') {
           navigate('/');
+        }
+        // If user is not authenticated and trying to access protected routes
+        else if (!session && location.pathname !== '/auth') {
+          navigate('/auth');
         }
       } catch (error) {
         const authError = error as AuthError;
@@ -54,5 +61,5 @@ export const useAuthState = () => {
     return () => {
       subscription.unsubscribe();
     };
-  }, [navigate, toast]);
+  }, [navigate, toast, location.pathname]);
 };
