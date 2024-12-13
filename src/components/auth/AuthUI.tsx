@@ -53,6 +53,12 @@ const AuthUI = () => {
         case 'INITIAL_SESSION':
           console.log('Initial session loaded');
           break;
+        case 'USER_DELETED':
+          toast({
+            title: "Account Deleted",
+            description: "Your account has been successfully deleted.",
+          });
+          break;
       }
     });
 
@@ -102,23 +108,13 @@ const AuthUI = () => {
               password_input_placeholder: 'Your password',
               link_text: "Don't have an account? Sign up",
             },
+            forgotten_password: {
+              link_text: 'Forgot password?',
+              button_label: 'Send reset instructions',
+              loading_button_label: 'Sending reset instructions...',
+              confirmation_text: 'Check your email for the password reset link',
+            },
           },
-        }}
-        onError={(error) => {
-          console.error('Auth error:', error);
-          if (error.message.includes('Invalid login credentials')) {
-            toast({
-              title: "Error",
-              description: "Invalid email or password. Please try again.",
-              variant: "destructive",
-            });
-          } else {
-            toast({
-              title: "Error",
-              description: "An error occurred. Please try again.",
-              variant: "destructive",
-            });
-          }
         }}
         theme="light"
       />
