@@ -46,14 +46,12 @@ export const AuthForm = () => {
       }}
       providers={[]}
       redirectTo={window.location.origin}
-      onAuthEvent={(event) => {
-        if (event.error) {
-          toast({
-            title: "Authentication Error",
-            description: event.error.message,
-            variant: "destructive",
-          });
-        }
+      onError={(error: AuthError) => {
+        toast({
+          title: "Authentication Error",
+          description: error.message,
+          variant: "destructive",
+        });
       }}
       localization={{
         variables: {
