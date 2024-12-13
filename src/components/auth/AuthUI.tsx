@@ -27,12 +27,6 @@ const AuthUI = () => {
           description: "Successfully signed in.",
         });
         navigate('/');
-      } else if (event === 'USER_DELETED') {
-        toast({
-          title: "Error",
-          description: "Authentication failed. Please try again.",
-          variant: "destructive",
-        });
       }
     });
 
@@ -41,11 +35,11 @@ const AuthUI = () => {
     };
   }, [navigate, toast]);
 
-  const handleError = (error: Error) => {
-    console.error('Auth error:', error);
+  const handleAuthError = () => {
+    console.log('Auth error - invalid credentials');
     toast({
-      title: "Authentication Error",
-      description: "Invalid credentials. Please check your email and password.",
+      title: "Not Signed Up",
+      description: "This email is not registered. Please sign up first.",
       variant: "destructive",
     });
   };
@@ -71,7 +65,6 @@ const AuthUI = () => {
         }}
         providers={[]}
         redirectTo={window.location.origin}
-        onError={handleError}
         localization={{
           variables: {
             sign_in: {
@@ -89,6 +82,7 @@ const AuthUI = () => {
           },
         }}
         theme="light"
+        onError={handleAuthError}
       />
     </div>
   );
