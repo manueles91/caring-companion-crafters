@@ -3,6 +3,7 @@ import { Card } from "./ui/card";
 import { Badge } from "./ui/badge";
 import { Button } from "./ui/button";
 import { MoreHorizontal, MessageSquare, Activity } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
 interface AgentCardProps {
   name: string;
@@ -13,6 +14,8 @@ interface AgentCardProps {
 }
 
 const AgentCard = ({ name, description, traits, interactions, onSelect }: AgentCardProps) => {
+  const navigate = useNavigate();
+
   return (
     <Card className="p-6 hover:shadow-lg transition-all duration-300 animate-fade-in">
       <div className="flex justify-between items-start mb-4">
@@ -36,10 +39,19 @@ const AgentCard = ({ name, description, traits, interactions, onSelect }: AgentC
           <MessageSquare className="h-4 w-4" />
           <span>{interactions} interactions</span>
         </div>
-        <Button onClick={onSelect} className="gap-2">
-          <Activity className="h-4 w-4" />
-          View Insights
-        </Button>
+        <div className="flex gap-2">
+          <Button onClick={onSelect} variant="outline" className="gap-2">
+            <Activity className="h-4 w-4" />
+            View Insights
+          </Button>
+          <Button 
+            onClick={() => navigate(`/chat?agent=${encodeURIComponent(name)}`)}
+            className="gap-2"
+          >
+            <MessageSquare className="h-4 w-4" />
+            Chat
+          </Button>
+        </div>
       </div>
     </Card>
   );
