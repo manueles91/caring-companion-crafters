@@ -21,29 +21,38 @@ const AuthUI = () => {
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
       console.log('Auth event:', event);
       
-      if (event === 'SIGNED_IN') {
-        toast({
-          title: "Welcome!",
-          description: "Successfully signed in.",
-        });
-        navigate('/');
-      } else if (event === 'SIGNED_OUT') {
-        toast({
-          title: "Signed Out",
-          description: "You have been signed out.",
-        });
-      } else if (event === 'USER_UPDATED') {
-        console.log('User updated:', session);
-      } else if (event === 'PASSWORD_RECOVERY') {
-        toast({
-          title: "Password Recovery",
-          description: "Please check your email for password reset instructions.",
-        });
-      } else if (event === 'USER_DELETED') {
-        toast({
-          title: "Account Deleted",
-          description: "Your account has been successfully deleted.",
-        });
+      switch (event) {
+        case 'SIGNED_IN':
+          toast({
+            title: "Welcome!",
+            description: "Successfully signed in.",
+          });
+          navigate('/');
+          break;
+        case 'SIGNED_OUT':
+          toast({
+            title: "Signed Out",
+            description: "You have been signed out.",
+          });
+          break;
+        case 'USER_UPDATED':
+          console.log('User updated:', session);
+          break;
+        case 'PASSWORD_RECOVERY':
+          toast({
+            title: "Password Recovery",
+            description: "Please check your email for password reset instructions.",
+          });
+          break;
+        case 'TOKEN_REFRESHED':
+          console.log('Token refreshed');
+          break;
+        case 'MFA_CHALLENGE_VERIFIED':
+          console.log('MFA verified');
+          break;
+        case 'INITIAL_SESSION':
+          console.log('Initial session loaded');
+          break;
       }
     });
 
