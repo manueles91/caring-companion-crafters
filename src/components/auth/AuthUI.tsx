@@ -27,7 +27,7 @@ const AuthUI = () => {
           description: "Successfully signed in.",
         });
         navigate('/');
-      } else if (event === 'USER_DELETED' || event === 'SIGNED_OUT') {
+      } else if (event === 'SIGNED_OUT') {
         console.log('Invalid credentials detected');
         toast({
           title: "Not Signed Up",
