@@ -82,7 +82,7 @@ const AuthUI = () => {
           },
         }}
         theme="light"
-        onError={handleAuthError}
+        onAuthError={handleAuthError}
       />
     </div>
   );
