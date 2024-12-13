@@ -27,6 +27,13 @@ const AuthUI = () => {
           description: "Successfully signed in.",
         });
         navigate('/');
+      } else if (event === 'USER_DELETED' || event === 'SIGNED_OUT') {
+        console.log('Invalid credentials detected');
+        toast({
+          title: "Not Signed Up",
+          description: "This email is not registered. Please sign up first.",
+          variant: "destructive",
+        });
       }
     });
 
@@ -34,15 +41,6 @@ const AuthUI = () => {
       subscription.unsubscribe();
     };
   }, [navigate, toast]);
-
-  const handleAuthError = () => {
-    console.log('Auth error - invalid credentials');
-    toast({
-      title: "Not Signed Up",
-      description: "This email is not registered. Please sign up first.",
-      variant: "destructive",
-    });
-  };
 
   return (
     <div className="max-w-md w-full mx-auto p-6">
@@ -82,7 +80,6 @@ const AuthUI = () => {
           },
         }}
         theme="light"
-        onAuthError={handleAuthError}
       />
     </div>
   );
