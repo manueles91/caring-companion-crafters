@@ -35,11 +35,11 @@ const Index = () => {
     if (!agents?.length) {
       return (
         <div className="col-span-full text-center py-12">
-          <h3 className="text-lg font-semibold mb-2">No agents found</h3>
-          <p className="text-muted-foreground mb-4">Create your first AI agent to get started</p>
+          <h3 className="text-lg font-semibold mb-2">No hay agentes</h3>
+          <p className="text-muted-foreground mb-4">Crea tu primer agente IA para comenzar</p>
           <Button onClick={() => setShowCreateForm(true)} className="gap-2">
             <Plus className="h-4 w-4" />
-            Create Agent
+            Crear Agente
           </Button>
         </div>
       );
@@ -48,6 +48,7 @@ const Index = () => {
     return agents.map((agent) => (
       <AgentCard
         key={agent.id}
+        id={agent.id}
         name={agent.name}
         description={agent.description}
         traits={agent.traits || []}
@@ -62,13 +63,13 @@ const Index = () => {
       <div className="container mx-auto px-4 py-8">
         <div className="flex justify-between items-center mb-8">
           <div>
-            <h1 className="text-4xl font-bold mb-2">AI Agents</h1>
-            <p className="text-muted-foreground">Create and manage your AI assistants</p>
+            <h1 className="text-4xl font-bold mb-2">Agentes IA</h1>
+            <p className="text-muted-foreground">Crea y gestiona tus asistentes IA</p>
           </div>
           {!showCreateForm && (
             <Button onClick={() => setShowCreateForm(true)} className="gap-2">
               <Plus className="h-4 w-4" />
-              New Agent
+              Nuevo Agente
             </Button>
           )}
         </div>

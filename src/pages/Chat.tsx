@@ -38,7 +38,7 @@ const Chat = () => {
       try {
         const { data, error } = await supabase
           .from('agents')
-          .select('*')
+          .select()
           .eq('id', agentId)
           .single();
 
