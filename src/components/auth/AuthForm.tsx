@@ -31,13 +31,6 @@ export const AuthForm = () => {
           title: "Profile Updated",
           description: "Your profile has been updated successfully.",
         });
-      } else if (event === "INITIAL_SESSION" && !session) {
-        // Handle authentication errors through session state
-        toast({
-          title: "Authentication Error",
-          description: "Invalid credentials. Please check your email and password.",
-          variant: "destructive",
-        });
       }
     });
 
@@ -63,6 +56,22 @@ export const AuthForm = () => {
       view="sign_in"
       showLinks={true}
       redirectTo={window.location.origin}
+      onError={(error) => {
+        console.error('Auth error:', error);
+        if (error.message.includes('Invalid login credentials')) {
+          toast({
+            title: "Authentication Error",
+            description: "Invalid credentials. Please check your email and password.",
+            variant: "destructive",
+          });
+        } else {
+          toast({
+            title: "Authentication Error",
+            description: error.message,
+            variant: "destructive",
+          });
+        }
+      }}
       localization={{
         variables: {
           sign_in: {
