@@ -76,7 +76,6 @@ const AuthUI = () => {
               password_label: 'Create a password (minimum 6 characters)',
               button_label: 'Sign up',
               loading_button_label: 'Creating account...',
-              password_help: 'Password must be at least 6 characters long',
             },
           },
         }}
