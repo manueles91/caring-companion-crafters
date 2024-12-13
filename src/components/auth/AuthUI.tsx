@@ -10,26 +10,6 @@ const AuthUI = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
-      if (event === 'SIGNED_IN') {
-        toast({
-          title: "Welcome back!",
-          description: "You have successfully signed in.",
-        });
-        navigate('/');
-      } else if (event === 'SIGNED_OUT') {
-        toast({
-          title: "Signed out",
-          description: "You have been signed out successfully.",
-        });
-      } else if (event === 'USER_UPDATED') {
-        toast({
-          title: "Profile updated",
-          description: "Your profile has been updated successfully.",
-        });
-      }
-    });
-
     // Check if user is already signed in
     supabase.auth.getSession().then(({ data: { session } }) => {
       if (session) {
@@ -37,16 +17,29 @@ const AuthUI = () => {
       }
     });
 
+    // Listen for auth state changes
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+      console.log('Auth event:', event);
+      
+      if (event === 'SIGNED_IN') {
+        toast({
+          title: "Welcome!",
+          description: "Successfully signed in.",
+        });
+        navigate('/');
+      }
+    });
+
     return () => {
       subscription.unsubscribe();
     };
-  }, [toast, navigate]);
+  }, [navigate, toast]);
 
   return (
     <div className="max-w-md w-full mx-auto p-6">
       <h2 className="text-2xl font-bold text-center mb-2">Welcome</h2>
       <p className="text-center text-muted-foreground mb-6">
-        Create an account or sign in to continue
+        Sign in to continue
       </p>
       <Auth
         supabaseClient={supabase}
@@ -65,29 +58,17 @@ const AuthUI = () => {
         redirectTo={window.location.origin}
         localization={{
           variables: {
+            sign_in: {
+              email_label: 'Email address',
+              password_label: 'Password',
+              button_label: 'Sign in',
+              loading_button_label: 'Signing in...',
+            },
             sign_up: {
               email_label: 'Email address',
               password_label: 'Create a password',
-              button_label: 'Create account',
+              button_label: 'Sign up',
               loading_button_label: 'Creating account...',
-              social_provider_text: 'Sign up with {{provider}}',
-              link_text: 'Don\'t have an account? Sign up',
-            },
-            sign_in: {
-              email_label: 'Email address',
-              password_label: 'Your password',
-              button_label: 'Sign in',
-              loading_button_label: 'Signing in...',
-              social_provider_text: 'Sign in with {{provider}}',
-              link_text: 'Already have an account? Sign in',
-            },
-            forgotten_password: {
-              link_text: 'Forgot password?',
-              email_label: 'Email address',
-              password_label: 'Your password',
-              button_label: 'Send reset instructions',
-              loading_button_label: 'Sending reset instructions...',
-              confirmation_text: 'Check your email for the password reset link',
             },
           },
         }}
