@@ -32,18 +32,6 @@ const AuthUI = () => {
     };
   }, [toast]);
 
-  const handleAuthError = (error: Error) => {
-    let errorMessage = "Please check your credentials and try again.";
-    if (error.message.includes("Invalid login credentials")) {
-      errorMessage = "Account not found. Please sign up first.";
-    }
-    toast({
-      title: "Authentication Error",
-      description: errorMessage,
-      variant: "destructive",
-    });
-  };
-
   return (
     <div className="max-w-md w-full mx-auto p-6">
       <h2 className="text-2xl font-bold text-center mb-2">Welcome</h2>
@@ -65,7 +53,6 @@ const AuthUI = () => {
         }}
         providers={[]}
         view="sign_up"
-        onError={handleAuthError}
         localization={{
           variables: {
             sign_up: {
@@ -83,6 +70,14 @@ const AuthUI = () => {
               loading_button_label: 'Signing in...',
               social_provider_text: 'Sign in with {{provider}}',
               link_text: 'Already have an account? Sign in',
+            },
+            forgotten_password: {
+              link_text: 'Forgot password?',
+              email_label: 'Email address',
+              password_label: 'Your password',
+              button_label: 'Send reset instructions',
+              loading_button_label: 'Sending reset instructions...',
+              confirmation_text: 'Check your email for the password reset link',
             },
           },
         }}
