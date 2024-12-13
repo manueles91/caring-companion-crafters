@@ -63,13 +63,6 @@ const AuthUI = () => {
         }}
         providers={[]}
         redirectTo={window.location.origin}
-        onError={(error) => {
-          toast({
-            title: "Authentication Error",
-            description: error.message,
-            variant: "destructive",
-          });
-        }}
         localization={{
           variables: {
             sign_up: {
