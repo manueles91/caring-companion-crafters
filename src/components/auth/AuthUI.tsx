@@ -28,17 +28,43 @@ const AuthUI = () => {
         });
         navigate('/');
       } else if (event === 'SIGNED_OUT') {
-        console.log('Invalid credentials detected');
+        // Handle sign out event
         toast({
-          title: "Not Signed Up",
-          description: "This email is not registered. Please sign up first.",
-          variant: "destructive",
+          title: "Signed Out",
+          description: "You have been signed out.",
         });
       }
     });
 
+    // Handle auth errors
+    const handleAuthError = (error: any) => {
+      if (error.message?.includes('Invalid login credentials')) {
+        toast({
+          title: "Sign In Failed",
+          description: "Incorrect email or password. Please try again.",
+          variant: "destructive",
+        });
+      } else if (error.message?.includes('Email not confirmed')) {
+        toast({
+          title: "Email Not Verified",
+          description: "Please check your email and verify your account.",
+          variant: "destructive",
+        });
+      } else {
+        toast({
+          title: "Error",
+          description: error.message || "An error occurred during authentication.",
+          variant: "destructive",
+        });
+      }
+    };
+
+    // Subscribe to auth error events
+    const authErrorSubscription = supabase.auth.onError(handleAuthError);
+
     return () => {
       subscription.unsubscribe();
+      authErrorSubscription.unsubscribe();
     };
   }, [navigate, toast]);
 
