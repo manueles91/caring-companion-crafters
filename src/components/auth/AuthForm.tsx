@@ -35,7 +35,7 @@ export const AuthForm = () => {
         // Handle authentication errors through session state
         toast({
           title: "Authentication Error",
-          description: "Please check your credentials and try again.",
+          description: "Invalid credentials. Please check your email and password.",
           variant: "destructive",
         });
       }
