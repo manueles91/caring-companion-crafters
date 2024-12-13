@@ -30,6 +30,8 @@ export const AuthForm = () => {
     };
   }, [toast]);
 
+  const providers: Provider[] = ["email"];
+
   return (
     <Auth
       supabaseClient={supabase}
@@ -44,7 +46,7 @@ export const AuthForm = () => {
           },
         },
       }}
-      providers={["email"] as Provider[]}
+      providers={providers}
       view="sign_in"
       showLinks={true}
       redirectTo={window.location.origin}
