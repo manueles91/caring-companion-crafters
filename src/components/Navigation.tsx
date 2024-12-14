@@ -54,7 +54,7 @@ export const Navigation = ({ session }: NavigationProps) => {
         <h1 className="text-xl font-bold">{t("nav.title")}</h1>
         
         <div className="flex items-center gap-2">
-          {session && !showCreateForm && (
+          {!showCreateForm && (
             <Button 
               variant="ghost" 
               size="icon"
