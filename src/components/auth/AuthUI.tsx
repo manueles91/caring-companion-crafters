@@ -13,8 +13,8 @@ const AuthUI = () => {
     } = supabase.auth.onAuthStateChange((event, session) => {
       if (event === "SIGNED_IN") {
         console.log("Signed in:", session);
-      } else if (event === "USER_DELETED" || event === "SIGNED_OUT") {
-        console.log("Signed out or deleted");
+      } else if (event === "SIGNED_OUT") {
+        console.log("Signed out");
       } else if (event === "PASSWORD_RECOVERY") {
         console.log("Password recovery requested");
       } else if (event === "INITIAL_SESSION") {
@@ -23,7 +23,13 @@ const AuthUI = () => {
         console.log("Token refreshed");
       } else if (event === "MFA_CHALLENGE_VERIFIED") {
         console.log("MFA verified");
-      } else if (event === "AUTH_ERROR") {
+      } else if (event === "USER_UPDATED") {
+        console.log("User updated");
+      }
+
+      // Handle invalid credentials error from response
+      const error = session as any;
+      if (error?.error?.message === "Invalid login credentials") {
         toast({
           title: "Authentication Error",
           description: "Invalid email or password. Please try again.",
