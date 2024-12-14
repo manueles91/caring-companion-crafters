@@ -19,7 +19,7 @@ const Index = () => {
     supabase.auth.getSession().then(({ data: { session } }) => {
       setSession(session);
       if (session?.user) {
-        checkUserProfile(session.user.id);
+        checkAndCreateProfile(session.user.id);
       }
     });
 
@@ -28,14 +28,14 @@ const Index = () => {
     } = supabase.auth.onAuthStateChange(async (_event, session) => {
       setSession(session);
       if (session?.user) {
-        checkUserProfile(session.user.id);
+        checkAndCreateProfile(session.user.id);
       }
     });
 
     return () => subscription.unsubscribe();
   }, []);
 
-  const checkUserProfile = async (userId: string) => {
+  const checkAndCreateProfile = async (userId: string) => {
     try {
       const { data: profile, error } = await supabase
         .from('profiles')
@@ -43,24 +43,39 @@ const Index = () => {
         .eq('id', userId)
         .maybeSingle();
 
-      if (error) {
-        console.error('Error fetching profile:', error);
-        toast({
-          title: "Error",
-          description: "Could not fetch user profile",
-          variant: "destructive",
-        });
-        return;
-      }
+      if (!profile && (!error || error.code === 'PGRST116')) {
+        const { data: newProfile, error: insertError } = await supabase
+          .from('profiles')
+          .upsert({
+            id: userId,
+            username: session?.user?.email,
+            role: 'user'
+          })
+          .select()
+          .single();
 
-      if (profile) {
+        if (insertError) {
+          console.error('Error creating profile:', insertError);
+          toast({
+            title: "Error",
+            description: "Could not create user profile",
+            variant: "destructive",
+          });
+        } else if (newProfile) {
+          setUserRole(newProfile.role as 'user' | 'creator');
+          toast({
+            title: "Success",
+            description: "Profile created successfully",
+          });
+        }
+      } else if (profile) {
         setUserRole(profile.role as 'user' | 'creator');
       }
     } catch (error) {
       console.error('Error handling profile:', error);
       toast({
         title: "Error",
-        description: "An error occurred while checking your profile",
+        description: "An error occurred while setting up your profile",
         variant: "destructive",
       });
     }
