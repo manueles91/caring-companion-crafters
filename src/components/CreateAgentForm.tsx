@@ -7,7 +7,7 @@ import { useToast } from "./ui/use-toast";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import PersonalityTraits from "./agents/PersonalityTraits";
-import { useAgentData } from "@/hooks/useAgentData";
+import { useQuery } from "@tanstack/react-query";
 import { ArrowLeft } from "lucide-react";
 
 interface CreateAgentFormProps {
@@ -23,16 +23,32 @@ const CreateAgentForm = ({ agentId }: CreateAgentFormProps) => {
   const { toast } = useToast();
   const navigate = useNavigate();
 
-  const handleDataLoaded = (data: any) => {
-    if (data) {
-      setName(data.name);
-      setDescription(data.description);
-      setInstructions(data.instructions || '');
-      setSelectedTraits(data.traits || []);
-    }
-  };
+  // Load agent data if editing
+  const { data: agentData } = useQuery({
+    queryKey: ['agent', agentId],
+    queryFn: async () => {
+      if (!agentId) return null;
+      const { data, error } = await supabase
+        .from('agents')
+        .select('*')
+        .eq('id', agentId)
+        .single();
+      
+      if (error) throw error;
+      return data;
+    },
+    enabled: !!agentId
+  });
 
-  useAgentData(agentId, handleDataLoaded);
+  // Update form when agent data is loaded
+  React.useEffect(() => {
+    if (agentData) {
+      setName(agentData.name || '');
+      setDescription(agentData.description || '');
+      setInstructions(agentData.instructions || '');
+      setSelectedTraits(agentData.traits || []);
+    }
+  }, [agentData]);
 
   const toggleTrait = (trait: string) => {
     if (selectedTraits.includes(trait)) {
