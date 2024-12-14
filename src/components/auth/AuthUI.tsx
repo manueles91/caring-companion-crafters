@@ -29,29 +29,48 @@ const AuthUI = () => {
       } else if (event === "USER_UPDATED") {
         console.log("User updated");
       }
-
-      // Handle errors from response
-      const error = session as any;
-      if (error?.error?.message === "Invalid login credentials") {
-        toast({
-          title: "Authentication Error",
-          description: "Invalid email or password. Please try again.",
-          variant: "destructive",
-        });
-      } else if (error?.error?.message?.includes("User already registered")) {
-        setView("sign_in");
-        toast({
-          title: "Sign Up Error",
-          description: "This email is already registered. Please sign in instead.",
-          variant: "destructive",
-        });
-      }
     });
 
     return () => {
       subscription.unsubscribe();
     };
   }, [toast, navigate]);
+
+  const handleError = (error: any) => {
+    try {
+      // Parse the error message if it's a string
+      const errorBody = typeof error.message === 'string' ? JSON.parse(error.message) : error;
+      
+      if (errorBody?.message === "Invalid login credentials") {
+        toast({
+          title: "Authentication Error",
+          description: "Invalid email or password. Please try again.",
+          variant: "destructive",
+        });
+      } else if (errorBody?.message === "User already registered") {
+        setView("sign_in");
+        toast({
+          title: "Sign Up Error",
+          description: "This email is already registered. Please sign in instead.",
+          variant: "destructive",
+        });
+      } else {
+        // Generic error handling
+        toast({
+          title: "Error",
+          description: errorBody?.message || "An error occurred. Please try again.",
+          variant: "destructive",
+        });
+      }
+    } catch (e) {
+      // Fallback for unparseable errors
+      toast({
+        title: "Error",
+        description: "An unexpected error occurred. Please try again.",
+        variant: "destructive",
+      });
+    }
+  };
 
   return (
     <div className="max-w-md w-full mx-auto p-6">
@@ -78,6 +97,7 @@ const AuthUI = () => {
         redirectTo={window.location.origin}
         onlyThirdPartyProviders={false}
         showLinks={true}
+        onError={handleError}
       />
     </div>
   );
