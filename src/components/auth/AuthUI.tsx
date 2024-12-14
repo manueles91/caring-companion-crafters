@@ -2,13 +2,12 @@ import { Auth } from "@supabase/auth-ui-react";
 import { ThemeSupa } from "@supabase/auth-ui-shared";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 
 const AuthUI = () => {
   const { toast } = useToast();
   const navigate = useNavigate();
-  const [view, setView] = useState<"sign_in" | "sign_up">("sign_up");
 
   useEffect(() => {
     const {
@@ -29,48 +28,22 @@ const AuthUI = () => {
       } else if (event === "USER_UPDATED") {
         console.log("User updated");
       }
+
+      // Handle invalid credentials error from response
+      const error = session as any;
+      if (error?.error?.message === "Invalid login credentials") {
+        toast({
+          title: "Authentication Error",
+          description: "Invalid email or password. Please try again.",
+          variant: "destructive",
+        });
+      }
     });
 
     return () => {
       subscription.unsubscribe();
     };
   }, [toast, navigate]);
-
-  const handleError = (error: any) => {
-    try {
-      // Parse the error message if it's a string
-      const errorBody = typeof error.message === 'string' ? JSON.parse(error.message) : error;
-      
-      if (errorBody?.message === "Invalid login credentials") {
-        toast({
-          title: "Authentication Error",
-          description: "Invalid email or password. Please try again.",
-          variant: "destructive",
-        });
-      } else if (errorBody?.message === "User already registered") {
-        setView("sign_in");
-        toast({
-          title: "Sign Up Error",
-          description: "This email is already registered. Please sign in instead.",
-          variant: "destructive",
-        });
-      } else {
-        // Generic error handling
-        toast({
-          title: "Error",
-          description: errorBody?.message || "An error occurred. Please try again.",
-          variant: "destructive",
-        });
-      }
-    } catch (e) {
-      // Fallback for unparseable errors
-      toast({
-        title: "Error",
-        description: "An unexpected error occurred. Please try again.",
-        variant: "destructive",
-      });
-    }
-  };
 
   return (
     <div className="max-w-md w-full mx-auto p-6">
@@ -92,12 +65,11 @@ const AuthUI = () => {
           },
         }}
         providers={[]}
-        view={view}
+        view="sign_up"
         theme="light"
         redirectTo={window.location.origin}
         onlyThirdPartyProviders={false}
         showLinks={true}
-        onError={handleError}
       />
     </div>
   );
