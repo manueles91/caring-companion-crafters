@@ -2,12 +2,13 @@ import { Auth } from "@supabase/auth-ui-react";
 import { ThemeSupa } from "@supabase/auth-ui-shared";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 const AuthUI = () => {
   const { toast } = useToast();
   const navigate = useNavigate();
+  const [view, setView] = useState<"sign_in" | "sign_up">("sign_up");
 
   useEffect(() => {
     const {
@@ -38,6 +39,7 @@ const AuthUI = () => {
           variant: "destructive",
         });
       } else if (error?.error?.message?.includes("User already registered")) {
+        setView("sign_in");
         toast({
           title: "Sign Up Error",
           description: "This email is already registered. Please sign in instead.",
@@ -71,7 +73,7 @@ const AuthUI = () => {
           },
         }}
         providers={[]}
-        view="sign_up"
+        view={view}
         theme="light"
         redirectTo={window.location.origin}
         onlyThirdPartyProviders={false}
