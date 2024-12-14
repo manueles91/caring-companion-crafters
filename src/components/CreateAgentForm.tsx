@@ -90,7 +90,9 @@ const CreateAgentForm = () => {
 
   return (
     <Card className="p-6 max-w-2xl mx-auto animate-fade-in">
-      <h2 className="text-2xl font-semibold mb-6">Crear Nuevo Agente IA</h2>
+      <div className="flex items-center gap-2 mb-6">
+        <h2 className="text-2xl font-semibold">Crear Nuevo Agente IA</h2>
+      </div>
       
       <form onSubmit={handleSubmit} className="space-y-6">
         <div>

@@ -17,11 +17,11 @@ const AgentHeader = ({ userRole, showCreateForm, onCreateAgent, session }: Agent
 
   const handleCreateAgent = () => {
     if (!session) {
-      // Scroll to auth section
-      const authSection = document.getElementById('auth-section');
-      if (authSection) {
-        authSection.scrollIntoView({ behavior: 'smooth' });
-      }
+      // Scroll to the bottom of the page
+      window.scrollTo({
+        top: document.documentElement.scrollHeight,
+        behavior: 'smooth'
+      });
       
       toast({
         title: "Sign in required",

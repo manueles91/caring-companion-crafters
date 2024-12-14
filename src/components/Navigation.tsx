@@ -1,8 +1,8 @@
-import { Menu, LogOut } from "lucide-react";
+import { Menu, LogOut, Plus, ArrowLeft } from "lucide-react";
 import { Button } from "./ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "./ui/sheet";
 import { supabase } from "@/integrations/supabase/client";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { useToast } from "./ui/use-toast";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { LanguageSelector } from "./LanguageSelector";
@@ -13,8 +13,10 @@ interface NavigationProps {
 
 export const Navigation = ({ session }: NavigationProps) => {
   const navigate = useNavigate();
+  const location = useLocation();
   const { toast } = useToast();
   const { t } = useLanguage();
+  const showCreateForm = location.pathname === "/" && new URLSearchParams(location.search).get("create") === "true";
 
   const handleSignOut = async () => {
     try {
@@ -29,6 +31,21 @@ export const Navigation = ({ session }: NavigationProps) => {
         variant: "destructive",
       });
     }
+  };
+
+  const handleCreateAgent = () => {
+    if (!session) {
+      window.scrollTo({
+        top: document.documentElement.scrollHeight,
+        behavior: 'smooth'
+      });
+      toast({
+        title: "Sign in required",
+        description: "Please sign in or create an account to create your own agents",
+      });
+      return;
+    }
+    navigate("/?create=true");
   };
 
   return (
@@ -48,10 +65,34 @@ export const Navigation = ({ session }: NavigationProps) => {
               </div>
             </SheetContent>
           </Sheet>
-          <h1 className="text-xl font-bold">{t("nav.title")}</h1>
+          <div className="flex items-center gap-4">
+            {showCreateForm ? (
+              <Button 
+                variant="ghost" 
+                size="icon"
+                onClick={() => navigate("/")}
+                className="mr-2"
+              >
+                <ArrowLeft className="h-5 w-5" />
+                <span className="sr-only">Back</span>
+              </Button>
+            ) : null}
+            <h1 className="text-xl font-bold">{t("nav.title")}</h1>
+          </div>
         </div>
         
         <div className="flex items-center gap-2">
+          {session && !showCreateForm && (
+            <Button 
+              variant="ghost" 
+              size="icon"
+              onClick={handleCreateAgent}
+              className="text-muted-foreground hover:text-foreground"
+            >
+              <Plus className="h-5 w-5" />
+              <span className="sr-only">Create Agent</span>
+            </Button>
+          )}
           <LanguageSelector />
           {session && (
             <Button 
