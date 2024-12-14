@@ -1,7 +1,6 @@
 import React from "react";
 import { Card } from "./ui/card";
 import { Badge } from "./ui/badge";
-import { Button } from "./ui/button";
 import { Avatar, AvatarImage, AvatarFallback } from "./ui/avatar";
 import { MessageSquare, UserRound } from "lucide-react";
 import { useNavigate } from "react-router-dom";
@@ -45,7 +44,10 @@ const AgentCard = ({ id, name, traits, onSelect }: AgentCardProps) => {
   const expertise = traits[0] || "General Assistant";
 
   return (
-    <Card className="p-3 hover:shadow-lg transition-all duration-300 animate-fade-in">
+    <Card 
+      className="p-3 hover:shadow-lg transition-all duration-300 animate-fade-in cursor-pointer"
+      onClick={() => navigate(`/chat?agent=${id}`)}
+    >
       <div className="flex flex-col items-center text-center space-y-2">
         <Avatar className="w-16 h-16">
           <AvatarImage src={avatarUrl} alt={name} />
@@ -58,19 +60,11 @@ const AgentCard = ({ id, name, traits, onSelect }: AgentCardProps) => {
           {expertise}
         </Badge>
       </div>
-      <div className="flex justify-between items-center mt-3">
+      <div className="flex items-center justify-center mt-3">
         <div className="flex items-center gap-1 text-xs text-muted-foreground">
           <MessageSquare className="h-3 w-3" />
           <span>{interactionCount}</span>
         </div>
-        <Button 
-          onClick={() => navigate(`/chat?agent=${id}`)}
-          size="sm"
-          className="text-xs px-2 py-1"
-        >
-          <MessageSquare className="h-3 w-3 mr-1" />
-          Chat
-        </Button>
       </div>
     </Card>
   );
