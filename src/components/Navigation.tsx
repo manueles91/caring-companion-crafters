@@ -59,7 +59,7 @@ export const Navigation = ({ session }: NavigationProps) => {
               variant="ghost" 
               size="icon"
               onClick={handleCreateAgent}
-              className="text-green-500 hover:text-green-600 hover:bg-green-50 ring-2 ring-green-500 ring-offset-2"
+              className="bg-green-500 text-white hover:bg-green-600 hover:translate-y-[1px] transform transition-all shadow-[0_4px_0_0_rgb(22,163,74)] hover:shadow-[0_2px_0_0_rgb(22,163,74)] active:translate-y-[2px] active:shadow-[0_0px_0_0_rgb(22,163,74)]"
             >
               <Plus className="h-5 w-5" />
               <span className="sr-only">{t("nav.createAgent")}</span>
