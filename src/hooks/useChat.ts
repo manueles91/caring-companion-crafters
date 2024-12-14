@@ -33,14 +33,14 @@ export const useChat = (agentId: string | null) => {
         }
 
         // Check guest interaction count
-        const { data: interactions, error } = await supabase
+        const { data: interactions } = await supabase
           .from('guest_interactions')
           .select('interaction_count')
           .eq('guest_id', guestId)
           .eq('agent_id', agentId)
-          .single();
+          .maybeSingle(); // Using maybeSingle() instead of single()
 
-        if (!error && interactions?.interaction_count >= 5) {
+        if (interactions?.interaction_count >= 5) {
           toast({
             title: "Sign up required",
             description: "You've reached the maximum number of messages as a guest. Please sign up to continue.",
@@ -121,14 +121,14 @@ export const useChat = (agentId: string | null) => {
     const guestId = localStorage.getItem('guestId');
     if (!guestId || !agent) return;
 
-    const { data, error } = await supabase
+    const { data: existingInteraction } = await supabase
       .from('guest_interactions')
       .select('*')
       .eq('guest_id', guestId)
       .eq('agent_id', agent.id)
-      .single();
+      .maybeSingle(); // Using maybeSingle() instead of single()
 
-    if (error) {
+    if (!existingInteraction) {
       // If no record exists, create one
       await supabase
         .from('guest_interactions')
@@ -139,11 +139,11 @@ export const useChat = (agentId: string | null) => {
         });
     } else {
       // Update existing record
-      const newCount = (data.interaction_count || 0) + 1;
+      const newCount = (existingInteraction.interaction_count || 0) + 1;
       await supabase
         .from('guest_interactions')
         .update({ interaction_count: newCount })
-        .eq('id', data.id);
+        .eq('id', existingInteraction.id);
 
       if (newCount >= 5) {
         toast({
