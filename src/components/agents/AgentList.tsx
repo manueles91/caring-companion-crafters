@@ -30,10 +30,10 @@ const AgentList = ({ userRole, onCreateAgent }: AgentListProps) => {
 
   if (isLoading) {
     return (
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 px-4">
         {Array(3).fill(0).map((_, index) => (
           <div key={index} className="space-y-3">
-            <Skeleton className="h-[200px] w-full rounded-xl" />
+            <Skeleton className="h-[400px] w-full rounded-xl" />
           </div>
         ))}
       </div>
@@ -42,7 +42,7 @@ const AgentList = ({ userRole, onCreateAgent }: AgentListProps) => {
 
   if (!agents?.length) {
     return (
-      <div className="col-span-full text-center py-12">
+      <div className="text-center py-12">
         <h3 className="text-lg font-semibold mb-2">{t("agents.noAgents")}</h3>
         <p className="text-muted-foreground mb-4">
           {userRole === 'creator' 
@@ -60,17 +60,19 @@ const AgentList = ({ userRole, onCreateAgent }: AgentListProps) => {
   }
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-      {agents.map((agent) => (
-        <AgentCard
-          key={agent.id}
-          id={agent.id}
-          name={agent.name}
-          description={agent.description}
-          traits={agent.traits || []}
-          onSelect={() => console.log("Selected agent:", agent.name)}
-        />
-      ))}
+    <div className="container mx-auto px-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+        {agents.map((agent) => (
+          <AgentCard
+            key={agent.id}
+            id={agent.id}
+            name={agent.name}
+            description={agent.description}
+            traits={agent.traits || []}
+            onSelect={() => console.log("Selected agent:", agent.name)}
+          />
+        ))}
+      </div>
     </div>
   );
 };

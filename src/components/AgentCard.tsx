@@ -2,7 +2,8 @@ import React from "react";
 import { Card } from "./ui/card";
 import { Badge } from "./ui/badge";
 import { Button } from "./ui/button";
-import { MoreHorizontal, MessageSquare, Activity } from "lucide-react";
+import { Avatar, AvatarImage, AvatarFallback } from "./ui/avatar";
+import { MoreHorizontal, MessageSquare, Activity, UserRound } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
@@ -32,40 +33,48 @@ const AgentCard = ({ id, name, description, traits, onSelect }: AgentCardProps) 
     },
   });
 
+  // Get a random placeholder image for the agent
+  const placeholderImages = [
+    'photo-1649972904349-6e44c42644a7',
+    'photo-1486312338219-ce68d2c6f44d',
+    'photo-1581091226825-a6a2a5aee158',
+    'photo-1581092795360-fd1ca04f0952'
+  ];
+  
+  const randomImage = placeholderImages[Math.floor(Math.random() * placeholderImages.length)];
+  const avatarUrl = `https://images.unsplash.com/${randomImage}`;
+
   return (
     <Card className="p-6 hover:shadow-lg transition-all duration-300 animate-fade-in">
-      <div className="flex justify-between items-start mb-4">
-        <div>
-          <h3 className="text-xl font-semibold mb-2">{name}</h3>
-          <p className="text-sm text-muted-foreground mb-4">{description}</p>
-        </div>
-        <Button variant="ghost" size="icon">
-          <MoreHorizontal className="h-5 w-5" />
-        </Button>
+      <div className="flex flex-col items-center text-center mb-4">
+        <Avatar className="w-24 h-24 mb-4">
+          <AvatarImage src={avatarUrl} alt={name} />
+          <AvatarFallback>
+            <UserRound className="w-12 h-12" />
+          </AvatarFallback>
+        </Avatar>
+        <h3 className="text-xl font-semibold mb-2">{name}</h3>
+        <p className="text-sm text-muted-foreground mb-4">{description}</p>
       </div>
-      <div className="flex flex-wrap gap-2 mb-4">
+      <div className="flex flex-wrap justify-center gap-2 mb-4">
         {traits.map((trait, index) => (
           <Badge key={index} variant="secondary" className="text-xs">
             {trait}
           </Badge>
         ))}
       </div>
-      <div className="flex justify-between items-center">
+      <div className="flex justify-between items-center mt-4">
         <div className="flex items-center gap-2 text-sm text-muted-foreground">
           <MessageSquare className="h-4 w-4" />
           <span>{interactionCount}</span>
         </div>
         <div className="flex gap-2">
-          <Button onClick={onSelect} variant="outline" className="gap-2">
-            <Activity className="h-4 w-4" />
-            Ver Estadísticas
-          </Button>
           <Button 
             onClick={() => navigate(`/chat?agent=${id}`)}
-            className="gap-2"
+            className="w-full"
           >
-            <MessageSquare className="h-4 w-4" />
-            Chatear
+            <MessageSquare className="h-4 w-4 mr-2" />
+            Chat Now
           </Button>
         </div>
       </div>
