@@ -1,9 +1,8 @@
-import { SignIn } from "@clerk/clerk-react";
-import { useNavigate } from "react-router-dom";
+import { useAuthState } from "@/hooks/useAuthState";
+import { AuthForm } from "./AuthForm";
 
 const AuthUI = () => {
-  const navigate = useNavigate();
-  const currentDomain = window.location.origin;
+  useAuthState();
 
   return (
     <div className="max-w-md w-full mx-auto p-6">
@@ -11,17 +10,7 @@ const AuthUI = () => {
       <p className="text-center text-muted-foreground mb-6">
         Sign in to continue
       </p>
-      <SignIn 
-        redirectUrl={currentDomain}
-        routing="path"
-        path="/auth"
-        appearance={{
-          elements: {
-            formButtonPrimary: 
-              "bg-black hover:bg-gray-800 text-sm normal-case",
-          },
-        }}
-      />
+      <AuthForm />
     </div>
   );
 };
