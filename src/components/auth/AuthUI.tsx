@@ -30,9 +30,15 @@ const AuthUI = () => {
         console.log("User updated");
       }
 
-      // Handle invalid credentials error from response
+      // Handle user already exists error from response
       const error = session as any;
-      if (error?.error?.message === "Invalid login credentials") {
+      if (error?.error?.message === "User already registered") {
+        toast({
+          title: "Account Already Exists",
+          description: "This email is already registered. Please sign in instead.",
+        });
+        setView("sign_in");
+      } else if (error?.error?.message === "Invalid login credentials") {
         toast({
           title: "Authentication Error",
           description: "Invalid email or password. Please try again.",
@@ -45,31 +51,6 @@ const AuthUI = () => {
       subscription.unsubscribe();
     };
   }, [toast, navigate]);
-
-  const handleAuthError = (error: Error) => {
-    console.error("Auth error:", error);
-    
-    try {
-      // Try to parse the error message if it's a stringified JSON
-      const errorBody = JSON.parse(error.message);
-      if (errorBody.code === "user_already_exists") {
-        toast({
-          title: "Account Already Exists",
-          description: "This email is already registered. Please sign in instead.",
-        });
-        setView("sign_in");
-        return;
-      }
-    } catch (e) {
-      // If error message isn't JSON or doesn't match expected format,
-      // show a generic error message
-      toast({
-        title: "Authentication Error",
-        description: error.message,
-        variant: "destructive",
-      });
-    }
-  };
 
   return (
     <div className="max-w-md w-full mx-auto p-6">
@@ -96,7 +77,6 @@ const AuthUI = () => {
         redirectTo={window.location.origin}
         onlyThirdPartyProviders={false}
         showLinks={true}
-        onError={handleAuthError}
       />
     </div>
   );
