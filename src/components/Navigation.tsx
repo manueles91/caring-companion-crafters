@@ -1,3 +1,4 @@
+import React from "react";
 import { Menu, LogOut, Plus, LogIn } from "lucide-react";
 import { Button } from "./ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "./ui/sheet";
