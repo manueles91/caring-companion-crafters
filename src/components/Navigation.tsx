@@ -1,4 +1,4 @@
-import { Menu, LogOut, Plus, ArrowLeft } from "lucide-react";
+import { Menu, LogOut, Plus } from "lucide-react";
 import { Button } from "./ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "./ui/sheet";
 import { supabase } from "@/integrations/supabase/client";
@@ -51,35 +51,7 @@ export const Navigation = ({ session }: NavigationProps) => {
   return (
     <nav className="fixed top-0 left-0 right-0 z-50 bg-background border-b">
       <div className="container mx-auto px-4 h-16 flex items-center justify-between">
-        <div className="flex items-center gap-4">
-          <Sheet>
-            <SheetTrigger asChild>
-              <Button variant="ghost" size="icon" className="md:hidden">
-                <Menu className="h-5 w-5" />
-                <span className="sr-only">Toggle menu</span>
-              </Button>
-            </SheetTrigger>
-            <SheetContent side="left" className="w-64">
-              <div className="flex flex-col gap-4 mt-8">
-                <h2 className="text-lg font-semibold">{t("nav.title")}</h2>
-              </div>
-            </SheetContent>
-          </Sheet>
-          <div className="flex items-center gap-4">
-            {showCreateForm ? (
-              <Button 
-                variant="ghost" 
-                size="icon"
-                onClick={() => navigate("/")}
-                className="mr-2"
-              >
-                <ArrowLeft className="h-5 w-5" />
-                <span className="sr-only">{t("nav.back")}</span>
-              </Button>
-            ) : null}
-            <h1 className="text-xl font-bold">{t("nav.title")}</h1>
-          </div>
-        </div>
+        <h1 className="text-xl font-bold">{t("nav.title")}</h1>
         
         <div className="flex items-center gap-2">
           {session && !showCreateForm && (
@@ -94,17 +66,28 @@ export const Navigation = ({ session }: NavigationProps) => {
             </Button>
           )}
           <LanguageSelector />
-          {session && (
-            <Button 
-              variant="ghost" 
-              size="icon"
-              onClick={handleSignOut}
-              className="text-foreground hover:bg-accent hover:text-accent-foreground"
-            >
-              <LogOut className="h-5 w-5" />
-              <span className="sr-only">{t("nav.signOut")}</span>
-            </Button>
-          )}
+          <Sheet>
+            <SheetTrigger asChild>
+              <Button variant="ghost" size="icon">
+                <Menu className="h-5 w-5" />
+                <span className="sr-only">Toggle menu</span>
+              </Button>
+            </SheetTrigger>
+            <SheetContent side="right" className="w-64">
+              <div className="flex flex-col gap-4 mt-8">
+                {session && (
+                  <Button 
+                    variant="ghost" 
+                    className="justify-start gap-2"
+                    onClick={handleSignOut}
+                  >
+                    <LogOut className="h-5 w-5" />
+                    {t("nav.signOut")}
+                  </Button>
+                )}
+              </div>
+            </SheetContent>
+          </Sheet>
         </div>
       </div>
     </nav>

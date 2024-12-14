@@ -17,7 +17,6 @@ const AgentHeader = ({ userRole, showCreateForm, onCreateAgent, session }: Agent
 
   const handleCreateAgent = () => {
     if (!session) {
-      // Scroll to the bottom of the page
       window.scrollTo({
         top: document.documentElement.scrollHeight,
         behavior: 'smooth'
@@ -36,16 +35,8 @@ const AgentHeader = ({ userRole, showCreateForm, onCreateAgent, session }: Agent
 
   return (
     <div className="flex justify-between items-center mb-8">
-      <div>
-        <h1 className="text-4xl font-bold mb-2">{t("agents.title")}</h1>
-        <p className="text-muted-foreground">
-          {userRole === 'creator' 
-            ? t("agents.subtitle.creator")
-            : t("agents.subtitle.user")}
-        </p>
-      </div>
       {!showCreateForm && (
-        <Button onClick={handleCreateAgent} className="gap-2">
+        <Button onClick={handleCreateAgent} className="gap-2 ml-auto">
           <Plus className="h-4 w-4" />
           {t("agents.newAgent")}
         </Button>
