@@ -16,6 +16,7 @@ export const Navigation = ({ session }: NavigationProps) => {
   const location = useLocation();
   const { toast } = useToast();
   const { t } = useLanguage();
+  const [open, setOpen] = React.useState(false);
   const showCreateForm = location.pathname === "/" && new URLSearchParams(location.search).get("create") === "true";
 
   const handleSignOut = async () => {
@@ -25,6 +26,7 @@ export const Navigation = ({ session }: NavigationProps) => {
         title: "Signed out successfully",
       });
       navigate("/");
+      setOpen(false);
     } catch (error) {
       toast({
         title: "Error signing out",
@@ -53,6 +55,7 @@ export const Navigation = ({ session }: NavigationProps) => {
     if (authSection) {
       authSection.scrollIntoView({ behavior: 'smooth' });
     }
+    setOpen(false);
   };
 
   return (
@@ -73,7 +76,7 @@ export const Navigation = ({ session }: NavigationProps) => {
             </Button>
           )}
           <LanguageSelector />
-          <Sheet>
+          <Sheet open={open} onOpenChange={setOpen}>
             <SheetTrigger asChild>
               <Button variant="ghost" size="icon">
                 <Menu className="h-5 w-5" />
