@@ -33,7 +33,7 @@ const AgentCard = ({ id, name, traits, onSelect }: AgentCardProps) => {
       className="p-3 hover:shadow-lg transition-all duration-300 animate-fade-in cursor-pointer relative h-[280px] flex flex-col"
       onClick={() => navigate(`/chat?agent=${id}`)}
     >
-      <div className="flex-1 flex flex-col items-center text-center space-y-2">
+      <div className="flex flex-col items-center text-center space-y-2">
         <AgentAvatar name={name} />
         <h3 className="text-base font-semibold line-clamp-1">{name}</h3>
         <Badge variant="secondary" className="text-xs px-2 py-0.5">
