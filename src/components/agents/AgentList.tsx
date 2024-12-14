@@ -67,7 +67,6 @@ const AgentList = ({ userRole, onCreateAgent }: AgentListProps) => {
             key={agent.id}
             id={agent.id}
             name={agent.name}
-            description={agent.description}
             traits={agent.traits || []}
             onSelect={() => console.log("Selected agent:", agent.name)}
           />
