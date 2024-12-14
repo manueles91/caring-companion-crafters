@@ -68,12 +68,8 @@ const AuthUI = () => {
         view="sign_up"
         theme="light"
         redirectTo={window.location.origin}
-        emailRedirectTo={window.location.origin}
         onlyThirdPartyProviders={false}
         showLinks={true}
-        queryParams={{
-          emailRedirectTo: window.location.origin,
-        }}
       />
     </div>
   );
