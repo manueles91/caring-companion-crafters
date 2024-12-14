@@ -8,6 +8,7 @@ import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import PersonalityTraits from "./agents/PersonalityTraits";
 import { useAgentData } from "@/hooks/useAgentData";
+import { ArrowLeft } from "lucide-react";
 
 interface CreateAgentFormProps {
   agentId?: string | null;
@@ -114,9 +115,22 @@ const CreateAgentForm = ({ agentId }: CreateAgentFormProps) => {
     }
   };
 
+  const handleBack = () => {
+    navigate('/');
+  };
+
   return (
     <Card className="p-6 max-w-2xl mx-auto animate-fade-in">
-      <div className="flex items-center gap-2 mb-6">
+      <div className="flex items-center gap-4 mb-6">
+        <Button
+          variant="ghost"
+          size="icon"
+          onClick={handleBack}
+          className="hover:bg-accent"
+        >
+          <ArrowLeft className="h-5 w-5" />
+          <span className="sr-only">Volver</span>
+        </Button>
         <h2 className="text-2xl font-semibold">
           {agentId ? "Editar Agente IA" : "Crear Nuevo Agente IA"}
         </h2>
