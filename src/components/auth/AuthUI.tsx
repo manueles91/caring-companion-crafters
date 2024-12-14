@@ -3,26 +3,28 @@ import { ThemeSupa } from "@supabase/auth-ui-shared";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 
 const AuthUI = () => {
   const { toast } = useToast();
+  const navigate = useNavigate();
 
   useEffect(() => {
     const {
       data: { subscription },
-    } = supabase.auth.onAuthStateChange((event, session) => {
+    } = supabase.auth.onAuthStateChange(async (event, session) => {
       if (event === "SIGNED_IN") {
         console.log("Signed in:", session);
+        navigate("/");
       } else if (event === "SIGNED_OUT") {
         console.log("Signed out");
       } else if (event === "PASSWORD_RECOVERY") {
         console.log("Password recovery requested");
       } else if (event === "INITIAL_SESSION") {
         console.log("Initial session");
+        if (session) navigate("/");
       } else if (event === "TOKEN_REFRESHED") {
         console.log("Token refreshed");
-      } else if (event === "MFA_CHALLENGE_VERIFIED") {
-        console.log("MFA verified");
       } else if (event === "USER_UPDATED") {
         console.log("User updated");
       }
@@ -41,7 +43,7 @@ const AuthUI = () => {
     return () => {
       subscription.unsubscribe();
     };
-  }, [toast]);
+  }, [toast, navigate]);
 
   return (
     <div className="max-w-md w-full mx-auto p-6">
@@ -65,6 +67,13 @@ const AuthUI = () => {
         providers={[]}
         view="sign_up"
         theme="light"
+        redirectTo={window.location.origin}
+        emailRedirectTo={window.location.origin}
+        onlyThirdPartyProviders={false}
+        showLinks={true}
+        queryParams={{
+          emailRedirectTo: window.location.origin,
+        }}
       />
     </div>
   );
