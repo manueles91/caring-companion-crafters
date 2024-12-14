@@ -14,7 +14,7 @@ export const LanguageSelector = () => {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button variant="ghost" size="icon" className="text-muted-foreground hover:text-foreground">
+        <Button variant="ghost" size="icon" className="text-foreground hover:bg-accent hover:text-accent-foreground">
           <Languages className="h-5 w-5" />
           <span className="sr-only">Select language</span>
         </Button>

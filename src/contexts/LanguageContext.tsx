@@ -10,8 +10,10 @@ type LanguageContextType = {
 
 const translations = {
   en: {
-    "nav.title": "Virtual AI Assistant",
+    "nav.title": "My Assistants",
     "nav.signOut": "Sign out",
+    "nav.createAgent": "Create Agent",
+    "nav.back": "Back",
     "agents.title": "AI Agents",
     "agents.subtitle.creator": "Create and manage your AI assistants",
     "agents.subtitle.user": "Chat with AI assistants",
@@ -21,8 +23,10 @@ const translations = {
     "agents.noAgents.user": "No agents available at this time",
   },
   es: {
-    "nav.title": "Asistente Virtual IA",
+    "nav.title": "Mis Asistentes",
     "nav.signOut": "Cerrar sesión",
+    "nav.createAgent": "Crear Agente",
+    "nav.back": "Volver",
     "agents.title": "Agentes IA",
     "agents.subtitle.creator": "Crea y gestiona tus asistentes IA",
     "agents.subtitle.user": "Chatea con asistentes IA",

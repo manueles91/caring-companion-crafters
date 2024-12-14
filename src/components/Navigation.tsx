@@ -74,7 +74,7 @@ export const Navigation = ({ session }: NavigationProps) => {
                 className="mr-2"
               >
                 <ArrowLeft className="h-5 w-5" />
-                <span className="sr-only">Back</span>
+                <span className="sr-only">{t("nav.back")}</span>
               </Button>
             ) : null}
             <h1 className="text-xl font-bold">{t("nav.title")}</h1>
@@ -87,10 +87,10 @@ export const Navigation = ({ session }: NavigationProps) => {
               variant="ghost" 
               size="icon"
               onClick={handleCreateAgent}
-              className="text-muted-foreground hover:text-foreground"
+              className="text-foreground hover:bg-accent hover:text-accent-foreground"
             >
               <Plus className="h-5 w-5" />
-              <span className="sr-only">Create Agent</span>
+              <span className="sr-only">{t("nav.createAgent")}</span>
             </Button>
           )}
           <LanguageSelector />
@@ -99,7 +99,7 @@ export const Navigation = ({ session }: NavigationProps) => {
               variant="ghost" 
               size="icon"
               onClick={handleSignOut}
-              className="text-muted-foreground hover:text-foreground"
+              className="text-foreground hover:bg-accent hover:text-accent-foreground"
             >
               <LogOut className="h-5 w-5" />
               <span className="sr-only">{t("nav.signOut")}</span>
