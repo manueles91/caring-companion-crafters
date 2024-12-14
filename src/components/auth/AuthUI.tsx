@@ -13,9 +13,35 @@ const AuthUI = () => {
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange(async (event, session) => {
+      console.log("Auth event:", event);
+      console.log("Session:", session);
+
       if (event === "SIGNED_IN") {
-        console.log("Signed in:", session);
-        navigate("/");
+        // Verify profile creation
+        const { data: profile, error: profileError } = await supabase
+          .from('profiles')
+          .select('*')
+          .eq('id', session?.user?.id)
+          .single();
+
+        if (profileError) {
+          console.error('Error fetching profile:', profileError);
+          toast({
+            title: "Error",
+            description: "There was an issue with your profile creation. Please try again.",
+            variant: "destructive",
+          });
+          return;
+        }
+
+        if (profile) {
+          console.log("Profile created successfully:", profile);
+          toast({
+            title: "Welcome!",
+            description: "You have successfully signed in.",
+          });
+          navigate("/");
+        }
       } else if (event === "SIGNED_OUT") {
         console.log("Signed out");
       } else if (event === "PASSWORD_RECOVERY") {
@@ -23,13 +49,9 @@ const AuthUI = () => {
       } else if (event === "INITIAL_SESSION") {
         console.log("Initial session");
         if (session) navigate("/");
-      } else if (event === "TOKEN_REFRESHED") {
-        console.log("Token refreshed");
-      } else if (event === "USER_UPDATED") {
-        console.log("User updated");
       }
 
-      // Handle invalid credentials error from response
+      // Handle invalid credentials error
       const error = session as any;
       if (error?.error?.message === "Invalid login credentials") {
         toast({
