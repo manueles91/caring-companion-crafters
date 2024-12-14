@@ -16,28 +16,17 @@ export const ThemeToggle = () => {
     return "light";
   });
 
+  // Only run after mount to avoid hydration mismatch
   useEffect(() => {
     setMounted(true);
     const root = document.documentElement;
-    const storedTheme = localStorage.getItem("theme");
-    
-    if (storedTheme) {
-      setTheme(storedTheme as "light" | "dark");
-      root.classList.toggle("dark", storedTheme === "dark");
+    if (theme === "dark") {
+      root.classList.add("dark");
     } else {
-      const isDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
-      setTheme(isDark ? "dark" : "light");
-      root.classList.toggle("dark", isDark);
+      root.classList.remove("dark");
     }
-  }, []);
-
-  useEffect(() => {
-    if (mounted) {
-      const root = document.documentElement;
-      localStorage.setItem("theme", theme);
-      root.classList.toggle("dark", theme === "dark");
-    }
-  }, [theme, mounted]);
+    localStorage.setItem("theme", theme);
+  }, [theme]);
 
   if (!mounted) {
     return null;
