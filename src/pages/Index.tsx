@@ -89,50 +89,34 @@ const Index = () => {
     <div className="min-h-screen bg-background">
       <Navigation session={session} />
       <div className="container mx-auto px-4 py-8 pt-24">
-        {session ? (
-          <>
-            <AgentHeader 
-              userRole={userRole}
-              showCreateForm={showCreateForm}
-              onCreateAgent={() => setShowCreateForm(true)}
-            />
+        <AgentHeader 
+          userRole={userRole}
+          showCreateForm={showCreateForm}
+          onCreateAgent={() => setShowCreateForm(true)}
+          session={session}
+        />
 
-            {showCreateForm ? (
-              <div className="mb-8">
-                <CreateAgentForm />
-              </div>
-            ) : (
-              <AgentList 
-                userRole={userRole}
-                onCreateAgent={() => setShowCreateForm(true)}
-              />
-            )}
-          </>
+        {showCreateForm ? (
+          <div className="mb-8">
+            <CreateAgentForm />
+          </div>
         ) : (
-          <div>
-            <h1 className="text-2xl font-bold mb-6">Welcome! Try chatting with our agents</h1>
-            <p className="text-muted-foreground mb-8">
-              You can chat with our agents as a guest. After 5 messages, you'll need to sign up to continue.
-            </p>
-            <AgentList 
-              userRole={null}
-              onCreateAgent={() => {
-                toast({
-                  title: "Sign up required",
-                  description: "Please sign up to create new agents",
-                });
-              }}
-            />
-            <div className="mt-8 p-6 bg-muted rounded-lg">
-              <h2 className="text-xl font-semibold mb-4">Want to do more?</h2>
-              <p className="mb-4">Sign up to:</p>
-              <ul className="list-disc list-inside mb-6 space-y-2">
-                <li>Continue conversations after 5 messages</li>
-                <li>Create your own agents</li>
-                <li>Save your chat history</li>
-              </ul>
-              <AuthUI />
-            </div>
+          <AgentList 
+            userRole={userRole}
+            onCreateAgent={() => setShowCreateForm(true)}
+          />
+        )}
+
+        {!session && (
+          <div id="auth-section" className="mt-8 p-6 bg-muted rounded-lg scroll-mt-24">
+            <h2 className="text-xl font-semibold mb-4">Want to do more?</h2>
+            <p className="mb-4">Sign up to:</p>
+            <ul className="list-disc list-inside mb-6 space-y-2">
+              <li>Continue conversations after 5 messages</li>
+              <li>Create your own agents</li>
+              <li>Save your chat history</li>
+            </ul>
+            <AuthUI />
           </div>
         )}
       </div>
