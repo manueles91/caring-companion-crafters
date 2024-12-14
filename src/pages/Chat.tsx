@@ -5,14 +5,11 @@ import { Card } from "@/components/ui/card";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/components/ui/use-toast";
-import { Send } from "lucide-react";
+import { Send, ArrowLeft } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import ChatMessage from "@/components/chat/ChatMessage";
 import { Message, Agent } from "@/types/chat";
-import { useMessageStore } from "@/stores/messageStore";
-import { useAuthStore } from "@/stores/authStore";
 
-// Move isValidUUID to a separate utility file
 const isValidUUID = (uuid: string) => {
   const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
   return uuidRegex.test(uuid);
@@ -29,7 +26,6 @@ const Chat = () => {
   const { toast } = useToast();
   const scrollRef = React.useRef<HTMLDivElement>(null);
 
-  // Check authentication
   useEffect(() => {
     const checkAuth = async () => {
       const { data: { session } } = await supabase.auth.getSession();
@@ -81,7 +77,6 @@ const Chat = () => {
         if (agentError) throw agentError;
         setAgent(agentData);
 
-        // Fetch previous messages for this user and agent
         const { data: messagesData, error: messagesError } = await supabase
           .from('messages')
           .select('role, content')
@@ -142,7 +137,6 @@ const Chat = () => {
     setIsLoading(true);
 
     try {
-      // Store user message
       await storeMessage(userMessage);
 
       const { data, error } = await supabase.functions.invoke('chat', {
@@ -164,7 +158,6 @@ const Chat = () => {
         content: data.message 
       };
 
-      // Store assistant message
       await storeMessage(assistantMessage);
       
       setMessages((prev) => [...prev, assistantMessage]);
@@ -196,6 +189,17 @@ const Chat = () => {
 
   return (
     <div className="container mx-auto max-w-4xl p-4 h-screen flex flex-col">
+      <div className="mb-4">
+        <Button
+          variant="ghost"
+          size="icon"
+          onClick={() => navigate('/')}
+          className="hover:bg-accent"
+        >
+          <ArrowLeft className="h-5 w-5" />
+          <span className="sr-only">Back to agents</span>
+        </Button>
+      </div>
       <Card className="flex-1 p-4 flex flex-col">
         <h1 className="text-2xl font-bold mb-4">Chat con {agent?.name}</h1>
         
