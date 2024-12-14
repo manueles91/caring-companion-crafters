@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 
 const AuthUI = () => {
   const navigate = useNavigate();
+  const currentDomain = window.location.origin;
 
   return (
     <div className="max-w-md w-full mx-auto p-6">
@@ -11,8 +12,9 @@ const AuthUI = () => {
         Sign in to continue
       </p>
       <SignIn 
-        afterSignInUrl="/"
-        redirectUrl="/"
+        redirectUrl={currentDomain}
+        routing="path"
+        path="/auth"
         appearance={{
           elements: {
             formButtonPrimary: 
