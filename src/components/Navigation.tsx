@@ -4,10 +4,13 @@ import { Sheet, SheetContent, SheetTrigger } from "./ui/sheet";
 import { supabase } from "@/integrations/supabase/client";
 import { useNavigate } from "react-router-dom";
 import { useToast } from "./ui/use-toast";
+import { useLanguage } from "@/contexts/LanguageContext";
+import { LanguageSelector } from "./LanguageSelector";
 
 export const Navigation = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
+  const { t } = useLanguage();
 
   const handleSignOut = async () => {
     try {
@@ -37,23 +40,25 @@ export const Navigation = () => {
             </SheetTrigger>
             <SheetContent side="left" className="w-64">
               <div className="flex flex-col gap-4 mt-8">
-                <h2 className="text-lg font-semibold">Menu</h2>
-                {/* Add mobile menu items here */}
+                <h2 className="text-lg font-semibold">{t("nav.title")}</h2>
               </div>
             </SheetContent>
           </Sheet>
-          <h1 className="text-xl font-bold">Asistente Virtual IA</h1>
+          <h1 className="text-xl font-bold">{t("nav.title")}</h1>
         </div>
         
-        <Button 
-          variant="ghost" 
-          size="icon"
-          onClick={handleSignOut}
-          className="text-muted-foreground hover:text-foreground"
-        >
-          <LogOut className="h-5 w-5" />
-          <span className="sr-only">Sign out</span>
-        </Button>
+        <div className="flex items-center gap-2">
+          <LanguageSelector />
+          <Button 
+            variant="ghost" 
+            size="icon"
+            onClick={handleSignOut}
+            className="text-muted-foreground hover:text-foreground"
+          >
+            <LogOut className="h-5 w-5" />
+            <span className="sr-only">{t("nav.signOut")}</span>
+          </Button>
+        </div>
       </div>
     </nav>
   );

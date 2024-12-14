@@ -9,12 +9,14 @@ import { Skeleton } from "@/components/ui/skeleton";
 import AuthUI from "@/components/auth/AuthUI";
 import { useToast } from "@/components/ui/use-toast";
 import { Navigation } from "@/components/Navigation";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 const Index = () => {
   const [showCreateForm, setShowCreateForm] = React.useState(false);
   const [session, setSession] = React.useState(null);
   const [userRole, setUserRole] = React.useState<'user' | 'creator' | null>(null);
   const { toast } = useToast();
+  const { t } = useLanguage();
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
@@ -108,16 +110,16 @@ const Index = () => {
     if (!agents?.length) {
       return (
         <div className="col-span-full text-center py-12">
-          <h3 className="text-lg font-semibold mb-2">No hay agentes</h3>
+          <h3 className="text-lg font-semibold mb-2">{t("agents.noAgents")}</h3>
           <p className="text-muted-foreground mb-4">
             {userRole === 'creator' 
-              ? 'Crea tu primer agente IA para comenzar'
-              : 'No hay agentes disponibles en este momento'}
+              ? t("agents.noAgents.creator")
+              : t("agents.noAgents.user")}
           </p>
           {userRole === 'creator' && (
             <Button onClick={() => setShowCreateForm(true)} className="gap-2">
               <Plus className="h-4 w-4" />
-              Crear Agente
+              {t("agents.newAgent")}
             </Button>
           )}
         </div>
@@ -146,17 +148,17 @@ const Index = () => {
       <div className="container mx-auto px-4 py-8 pt-24">
         <div className="flex justify-between items-center mb-8">
           <div>
-            <h1 className="text-4xl font-bold mb-2">Agentes IA</h1>
+            <h1 className="text-4xl font-bold mb-2">{t("agents.title")}</h1>
             <p className="text-muted-foreground">
               {userRole === 'creator' 
-                ? 'Crea y gestiona tus asistentes IA'
-                : 'Chatea con asistentes IA'}
+                ? t("agents.subtitle.creator")
+                : t("agents.subtitle.user")}
             </p>
           </div>
           {userRole === 'creator' && !showCreateForm && (
             <Button onClick={() => setShowCreateForm(true)} className="gap-2">
               <Plus className="h-4 w-4" />
-              Nuevo Agente
+              {t("agents.newAgent")}
             </Button>
           )}
         </div>
