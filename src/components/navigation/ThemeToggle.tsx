@@ -3,17 +3,33 @@ import { Button } from "@/components/ui/button";
 import { useEffect, useState } from "react";
 
 export const ThemeToggle = () => {
-  const [theme, setTheme] = useState<"light" | "dark">("light");
+  const [theme, setTheme] = useState<"light" | "dark">(() => {
+    // Check localStorage and system preference on initial render
+    if (typeof window !== "undefined") {
+      const stored = localStorage.getItem("theme");
+      if (stored === "dark" || stored === "light") return stored;
+      
+      // Check system preference
+      if (window.matchMedia("(prefers-color-scheme: dark)").matches) {
+        return "dark";
+      }
+    }
+    return "light";
+  });
 
   useEffect(() => {
-    const isDark = document.documentElement.classList.contains("dark");
-    setTheme(isDark ? "dark" : "light");
-  }, []);
+    // Initialize theme on mount
+    const root = document.documentElement;
+    if (theme === "dark") {
+      root.classList.add("dark");
+    } else {
+      root.classList.remove("dark");
+    }
+    localStorage.setItem("theme", theme);
+  }, [theme]);
 
   const toggleTheme = () => {
-    const newTheme = theme === "light" ? "dark" : "light";
-    setTheme(newTheme);
-    document.documentElement.classList.toggle("dark");
+    setTheme(prev => prev === "light" ? "dark" : "light");
   };
 
   return (
