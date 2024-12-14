@@ -1,4 +1,4 @@
-import { Menu, LogOut, Plus } from "lucide-react";
+import { Menu, LogOut, Plus, LogIn } from "lucide-react";
 import { Button } from "./ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "./ui/sheet";
 import { supabase } from "@/integrations/supabase/client";
@@ -48,6 +48,13 @@ export const Navigation = ({ session }: NavigationProps) => {
     navigate("/?create=true");
   };
 
+  const scrollToAuth = () => {
+    const authSection = document.getElementById('auth-section');
+    if (authSection) {
+      authSection.scrollIntoView({ behavior: 'smooth' });
+    }
+  };
+
   return (
     <nav className="fixed top-0 left-0 right-0 z-50 bg-background border-b">
       <div className="container mx-auto px-4 h-16 flex items-center justify-between">
@@ -75,7 +82,7 @@ export const Navigation = ({ session }: NavigationProps) => {
             </SheetTrigger>
             <SheetContent side="right" className="w-64">
               <div className="flex flex-col gap-4 mt-8">
-                {session && (
+                {session ? (
                   <Button 
                     variant="ghost" 
                     className="justify-start gap-2"
@@ -83,6 +90,15 @@ export const Navigation = ({ session }: NavigationProps) => {
                   >
                     <LogOut className="h-5 w-5" />
                     {t("nav.signOut")}
+                  </Button>
+                ) : (
+                  <Button 
+                    variant="ghost" 
+                    className="justify-start gap-2"
+                    onClick={scrollToAuth}
+                  >
+                    <LogIn className="h-5 w-5" />
+                    Sign In
                   </Button>
                 )}
               </div>
