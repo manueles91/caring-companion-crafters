@@ -2,13 +2,12 @@ import { Auth } from "@supabase/auth-ui-react";
 import { ThemeSupa } from "@supabase/auth-ui-shared";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 
 const AuthUI = () => {
   const { toast } = useToast();
   const navigate = useNavigate();
-  const [view, setView] = useState<"sign_in" | "sign_up">("sign_up");
 
   useEffect(() => {
     const {
@@ -30,15 +29,9 @@ const AuthUI = () => {
         console.log("User updated");
       }
 
-      // Handle user already exists error from response
+      // Handle invalid credentials error from response
       const error = session as any;
-      if (error?.error?.message === "User already registered") {
-        toast({
-          title: "Account Already Exists",
-          description: "This email is already registered. Please sign in instead.",
-        });
-        setView("sign_in");
-      } else if (error?.error?.message === "Invalid login credentials") {
+      if (error?.error?.message === "Invalid login credentials") {
         toast({
           title: "Authentication Error",
           description: "Invalid email or password. Please try again.",
@@ -72,7 +65,7 @@ const AuthUI = () => {
           },
         }}
         providers={[]}
-        view={view}
+        view="sign_up"
         theme="light"
         redirectTo={window.location.origin}
         onlyThirdPartyProviders={false}
