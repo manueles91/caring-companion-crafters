@@ -30,10 +30,10 @@ const AgentList = ({ userRole, onCreateAgent }: AgentListProps) => {
 
   if (isLoading) {
     return (
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 px-4">
+      <div className="grid grid-cols-3 gap-3 px-2">
         {Array(3).fill(0).map((_, index) => (
-          <div key={index} className="space-y-3">
-            <Skeleton className="h-[400px] w-full rounded-xl" />
+          <div key={index} className="space-y-2">
+            <Skeleton className="h-[200px] w-full rounded-xl" />
           </div>
         ))}
       </div>
@@ -60,8 +60,8 @@ const AgentList = ({ userRole, onCreateAgent }: AgentListProps) => {
   }
 
   return (
-    <div className="container mx-auto px-4">
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+    <div className="container mx-auto px-2">
+      <div className="grid grid-cols-3 gap-3">
         {agents.map((agent) => (
           <AgentCard
             key={agent.id}

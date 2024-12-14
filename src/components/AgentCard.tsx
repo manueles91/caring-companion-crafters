@@ -42,34 +42,34 @@ const AgentCard = ({ id, name, traits, onSelect }: AgentCardProps) => {
   const randomImage = placeholderImages[Math.floor(Math.random() * placeholderImages.length)];
   const avatarUrl = `https://images.unsplash.com/${randomImage}`;
 
-  // Display only the first trait as expertise
   const expertise = traits[0] || "General Assistant";
 
   return (
-    <Card className="p-6 hover:shadow-lg transition-all duration-300 animate-fade-in">
-      <div className="flex flex-col items-center text-center mb-4">
-        <Avatar className="w-24 h-24 mb-4">
+    <Card className="p-3 hover:shadow-lg transition-all duration-300 animate-fade-in">
+      <div className="flex flex-col items-center text-center space-y-2">
+        <Avatar className="w-16 h-16">
           <AvatarImage src={avatarUrl} alt={name} />
           <AvatarFallback>
-            <UserRound className="w-12 h-12" />
+            <UserRound className="w-8 h-8" />
           </AvatarFallback>
         </Avatar>
-        <h3 className="text-xl font-semibold mb-2">{name}</h3>
-        <Badge variant="secondary" className="text-sm">
+        <h3 className="text-base font-semibold line-clamp-1">{name}</h3>
+        <Badge variant="secondary" className="text-xs px-2 py-0.5">
           {expertise}
         </Badge>
       </div>
-      <div className="flex justify-between items-center mt-4">
-        <div className="flex items-center gap-2 text-sm text-muted-foreground">
-          <MessageSquare className="h-4 w-4" />
+      <div className="flex justify-between items-center mt-3">
+        <div className="flex items-center gap-1 text-xs text-muted-foreground">
+          <MessageSquare className="h-3 w-3" />
           <span>{interactionCount}</span>
         </div>
         <Button 
           onClick={() => navigate(`/chat?agent=${id}`)}
-          className="w-full ml-2"
+          size="sm"
+          className="text-xs px-2 py-1"
         >
-          <MessageSquare className="h-4 w-4 mr-2" />
-          Chat Now
+          <MessageSquare className="h-3 w-3 mr-1" />
+          Chat
         </Button>
       </div>
     </Card>
