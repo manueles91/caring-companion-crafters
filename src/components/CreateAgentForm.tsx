@@ -1,14 +1,14 @@
 import React from "react";
 import { Card } from "./ui/card";
-import { Input } from "./ui/input";
 import { Button } from "./ui/button";
-import { Textarea } from "./ui/textarea";
 import { useToast } from "./ui/use-toast";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
-import PersonalityTraits from "./agents/PersonalityTraits";
 import { useQuery } from "@tanstack/react-query";
 import { ArrowLeft } from "lucide-react";
+import { validateAgentForm } from "@/utils/agentFormValidation";
+import { createAgent, updateAgent } from "@/utils/agentFormSubmission";
+import AgentFormFields from "./agents/AgentFormFields";
 
 interface CreateAgentFormProps {
   agentId?: string | null;
@@ -23,7 +23,6 @@ const CreateAgentForm = ({ agentId }: CreateAgentFormProps) => {
   const { toast } = useToast();
   const navigate = useNavigate();
 
-  // Load agent data if editing
   const { data: agentData } = useQuery({
     queryKey: ['agent', agentId],
     queryFn: async () => {
@@ -40,7 +39,6 @@ const CreateAgentForm = ({ agentId }: CreateAgentFormProps) => {
     enabled: !!agentId
   });
 
-  // Update form when agent data is loaded
   React.useEffect(() => {
     if (agentData) {
       setName(agentData.name || '');
@@ -61,10 +59,11 @@ const CreateAgentForm = ({ agentId }: CreateAgentFormProps) => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (!name.trim() || !description.trim()) {
+    const validationError = validateAgentForm(name, description);
+    if (validationError) {
       toast({
         title: "Error",
-        description: "Por favor completa los campos requeridos",
+        description: validationError,
         variant: "destructive",
       });
       return;
@@ -74,46 +73,28 @@ const CreateAgentForm = ({ agentId }: CreateAgentFormProps) => {
 
     try {
       const { data: { user } } = await supabase.auth.getUser();
-      
       if (!user) throw new Error("No user found");
 
+      const formData = {
+        name,
+        description,
+        instructions: instructions || null,
+        traits: selectedTraits,
+      };
+
       if (agentId) {
-        const { error } = await supabase
-          .from('agents')
-          .update({
-            name,
-            description,
-            instructions: instructions || null,
-            traits: selectedTraits,
-          })
-          .eq('id', agentId);
-
-        if (error) throw error;
-
+        await updateAgent(agentId, formData);
         toast({
           title: "¡Éxito!",
           description: "Agente actualizado correctamente",
         });
+        navigate('/');
       } else {
-        const { data: agent, error } = await supabase
-          .from('agents')
-          .insert({
-            name,
-            description,
-            instructions: instructions || null,
-            traits: selectedTraits,
-            creator_id: user.id,
-          })
-          .select()
-          .single();
-
-        if (error) throw error;
-
+        const agent = await createAgent(formData, user.id);
         toast({
           title: "¡Éxito!",
           description: "Agente creado correctamente",
         });
-
         navigate(`/chat?agent=${agent.id}`);
       }
     } catch (error) {
@@ -125,14 +106,7 @@ const CreateAgentForm = ({ agentId }: CreateAgentFormProps) => {
       });
     } finally {
       setIsSubmitting(false);
-      if (agentId) {
-        navigate('/');
-      }
     }
-  };
-
-  const handleBack = () => {
-    navigate('/');
   };
 
   return (
@@ -141,7 +115,7 @@ const CreateAgentForm = ({ agentId }: CreateAgentFormProps) => {
         <Button
           variant="ghost"
           size="icon"
-          onClick={handleBack}
+          onClick={() => navigate('/')}
           className="hover:bg-accent"
         >
           <ArrowLeft className="h-5 w-5" />
@@ -153,43 +127,16 @@ const CreateAgentForm = ({ agentId }: CreateAgentFormProps) => {
       </div>
       
       <form onSubmit={handleSubmit} className="space-y-6">
-        <div>
-          <label className="text-sm font-medium mb-2 block">Nombre del Agente *</label>
-          <Input 
-            placeholder="Ingresa el nombre del agente..." 
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-            required
-          />
-        </div>
-
-        <div>
-          <label className="text-sm font-medium mb-2 block">Descripción *</label>
-          <Textarea 
-            placeholder="Describe el propósito de tu agente..."
-            className="resize-none"
-            rows={4}
-            value={description}
-            onChange={(e) => setDescription(e.target.value)}
-            required
-          />
-        </div>
-
-        <PersonalityTraits 
+        <AgentFormFields
+          name={name}
+          setName={setName}
+          description={description}
+          setDescription={setDescription}
+          instructions={instructions}
+          setInstructions={setInstructions}
           selectedTraits={selectedTraits}
           onToggleTrait={toggleTrait}
         />
-
-        <div>
-          <label className="text-sm font-medium mb-2 block">Instrucciones Iniciales</label>
-          <Textarea 
-            placeholder="Proporciona instrucciones iniciales para tu agente..."
-            className="resize-none"
-            rows={6}
-            value={instructions}
-            onChange={(e) => setInstructions(e.target.value)}
-          />
-        </div>
 
         <Button 
           type="submit" 
