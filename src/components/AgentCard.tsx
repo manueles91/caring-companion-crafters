@@ -80,10 +80,12 @@ const AgentCard = ({ id, name, traits, onSelect }: AgentCardProps) => {
         </Badge>
       </div>
       <div className="flex items-center justify-between mt-3">
-        <div className="flex items-center gap-1 text-xs text-muted-foreground">
-          <MessageSquare className="h-3 w-3" />
-          <span>{interactionCount}</span>
-        </div>
+        {session && (
+          <div className="flex items-center gap-1 text-xs text-muted-foreground">
+            <MessageSquare className="h-3 w-3" />
+            <span>{interactionCount}</span>
+          </div>
+        )}
         {session ? (
           <button
             onClick={handleEdit}
