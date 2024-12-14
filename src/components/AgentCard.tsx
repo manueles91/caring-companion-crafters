@@ -6,6 +6,7 @@ import { MessageSquare, UserRound, Edit } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
+import { Button } from "./ui/button";
 
 interface AgentCardProps {
   id: string;
@@ -16,6 +17,14 @@ interface AgentCardProps {
 
 const AgentCard = ({ id, name, traits, onSelect }: AgentCardProps) => {
   const navigate = useNavigate();
+
+  const { data: session } = useQuery({
+    queryKey: ['session'],
+    queryFn: async () => {
+      const { data: { session } } = await supabase.auth.getSession();
+      return session;
+    },
+  });
 
   const { data: interactionCount = 0 } = useQuery({
     queryKey: ['interactions', id],
@@ -48,6 +57,11 @@ const AgentCard = ({ id, name, traits, onSelect }: AgentCardProps) => {
     navigate(`/?edit=${id}`);
   };
 
+  const handleChat = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    navigate(`/chat?agent=${id}`);
+  };
+
   return (
     <Card 
       className="p-3 hover:shadow-lg transition-all duration-300 animate-fade-in cursor-pointer relative"
@@ -70,12 +84,22 @@ const AgentCard = ({ id, name, traits, onSelect }: AgentCardProps) => {
           <MessageSquare className="h-3 w-3" />
           <span>{interactionCount}</span>
         </div>
-        <button
-          onClick={handleEdit}
-          className="p-1.5 rounded-full bg-accent hover:bg-accent/80 transition-colors"
-        >
-          <Edit className="h-4 w-4" />
-        </button>
+        {session ? (
+          <button
+            onClick={handleEdit}
+            className="p-1.5 rounded-full bg-accent hover:bg-accent/80 transition-colors"
+          >
+            <Edit className="h-4 w-4" />
+          </button>
+        ) : (
+          <Button
+            onClick={handleChat}
+            className="bg-green-500 text-white hover:bg-green-600 hover:translate-y-[1px] transform transition-all shadow-[0_4px_0_0_rgb(22,163,74)] hover:shadow-[0_2px_0_0_rgb(22,163,74)] active:translate-y-[2px] active:shadow-[0_0px_0_0_rgb(22,163,74)]"
+            size="sm"
+          >
+            Chat
+          </Button>
+        )}
       </div>
     </Card>
   );
