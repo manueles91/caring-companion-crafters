@@ -45,8 +45,7 @@ const AgentCard = ({ id, name, traits, onSelect }: AgentCardProps) => {
 
   const handleEdit = (e: React.MouseEvent) => {
     e.stopPropagation();
-    // TODO: Implement edit functionality
-    console.log('Edit agent:', id);
+    navigate(`/?edit=${id}`);
   };
 
   return (
@@ -54,12 +53,6 @@ const AgentCard = ({ id, name, traits, onSelect }: AgentCardProps) => {
       className="p-3 hover:shadow-lg transition-all duration-300 animate-fade-in cursor-pointer relative"
       onClick={() => navigate(`/chat?agent=${id}`)}
     >
-      <button
-        onClick={handleEdit}
-        className="absolute top-2 right-2 p-1.5 rounded-full bg-accent hover:bg-accent/80 transition-colors"
-      >
-        <Edit className="h-4 w-4" />
-      </button>
       <div className="flex flex-col items-center text-center space-y-2">
         <Avatar className="w-16 h-16">
           <AvatarImage src={avatarUrl} alt={name} />
@@ -72,11 +65,17 @@ const AgentCard = ({ id, name, traits, onSelect }: AgentCardProps) => {
           {expertise}
         </Badge>
       </div>
-      <div className="flex items-center justify-center mt-3">
+      <div className="flex items-center justify-between mt-3">
         <div className="flex items-center gap-1 text-xs text-muted-foreground">
           <MessageSquare className="h-3 w-3" />
           <span>{interactionCount}</span>
         </div>
+        <button
+          onClick={handleEdit}
+          className="p-1.5 rounded-full bg-accent hover:bg-accent/80 transition-colors"
+        >
+          <Edit className="h-4 w-4" />
+        </button>
       </div>
     </Card>
   );

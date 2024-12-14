@@ -59,7 +59,7 @@ export const Navigation = ({ session }: NavigationProps) => {
               variant="ghost" 
               size="icon"
               onClick={handleCreateAgent}
-              className="text-red-500 hover:text-red-600 hover:bg-red-50"
+              className="text-red-500 hover:text-red-600 hover:bg-red-50 ring-2 ring-red-500 ring-offset-2"
             >
               <Plus className="h-5 w-5" />
               <span className="sr-only">{t("nav.createAgent")}</span>

@@ -8,6 +8,7 @@ import { Plus, X } from "lucide-react";
 import { useToast } from "./ui/use-toast";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
+import { useQuery } from "@tanstack/react-query";
 
 const PERSONALITY_TRAITS = [
   "Amigable",
@@ -20,7 +21,11 @@ const PERSONALITY_TRAITS = [
   "Estructurado",
 ];
 
-const CreateAgentForm = () => {
+interface CreateAgentFormProps {
+  agentId?: string | null;
+}
+
+const CreateAgentForm = ({ agentId }: CreateAgentFormProps) => {
   const [selectedTraits, setSelectedTraits] = React.useState<string[]>([]);
   const [name, setName] = React.useState("");
   const [description, setDescription] = React.useState("");
@@ -28,6 +33,30 @@ const CreateAgentForm = () => {
   const [isSubmitting, setIsSubmitting] = React.useState(false);
   const { toast } = useToast();
   const navigate = useNavigate();
+
+  const { data: agent } = useQuery({
+    queryKey: ['agent', agentId],
+    queryFn: async () => {
+      if (!agentId) return null;
+      const { data, error } = await supabase
+        .from('agents')
+        .select('*')
+        .eq('id', agentId)
+        .single();
+      
+      if (error) throw error;
+      return data;
+    },
+    enabled: !!agentId,
+    onSuccess: (data) => {
+      if (data) {
+        setName(data.name);
+        setDescription(data.description);
+        setInstructions(data.instructions || '');
+        setSelectedTraits(data.traits || []);
+      }
+    }
+  });
 
   const toggleTrait = (trait: string) => {
     if (selectedTraits.includes(trait)) {
@@ -56,42 +85,66 @@ const CreateAgentForm = () => {
       
       if (!user) throw new Error("No user found");
 
-      const { data: agent, error } = await supabase
-        .from('agents')
-        .insert({
-          name,
-          description,
-          instructions: instructions || null,
-          traits: selectedTraits,
-          creator_id: user.id,
-        })
-        .select()
-        .single();
+      if (agentId) {
+        const { error } = await supabase
+          .from('agents')
+          .update({
+            name,
+            description,
+            instructions: instructions || null,
+            traits: selectedTraits,
+          })
+          .eq('id', agentId);
 
-      if (error) throw error;
+        if (error) throw error;
 
-      toast({
-        title: "¡Éxito!",
-        description: "Agente creado correctamente",
-      });
+        toast({
+          title: "¡Éxito!",
+          description: "Agente actualizado correctamente",
+        });
+      } else {
+        const { data: agent, error } = await supabase
+          .from('agents')
+          .insert({
+            name,
+            description,
+            instructions: instructions || null,
+            traits: selectedTraits,
+            creator_id: user.id,
+          })
+          .select()
+          .single();
 
-      navigate(`/chat?agent=${agent.id}`);
+        if (error) throw error;
+
+        toast({
+          title: "¡Éxito!",
+          description: "Agente creado correctamente",
+        });
+
+        navigate(`/chat?agent=${agent.id}`);
+      }
     } catch (error) {
-      console.error('Error al crear el agente:', error);
+      console.error('Error al crear/actualizar el agente:', error);
       toast({
         title: "Error",
-        description: "No se pudo crear el agente. Por favor intenta de nuevo.",
+        description: "No se pudo crear/actualizar el agente. Por favor intenta de nuevo.",
         variant: "destructive",
       });
     } finally {
       setIsSubmitting(false);
+      if (agentId) {
+        navigate('/');
+      }
     }
   };
 
   return (
     <Card className="p-6 max-w-2xl mx-auto animate-fade-in">
       <div className="flex items-center gap-2 mb-6">
-        <h2 className="text-2xl font-semibold">Crear Nuevo Agente IA</h2>
+        <h2 className="text-2xl font-semibold">
+          {agentId ? "Editar Agente IA" : "Crear Nuevo Agente IA"}
+        </h2>
       </div>
       
       <form onSubmit={handleSubmit} className="space-y-6">
@@ -154,7 +207,7 @@ const CreateAgentForm = () => {
           className="w-full"
           disabled={isSubmitting}
         >
-          {isSubmitting ? "Creando..." : "Crear Agente"}
+          {isSubmitting ? "Guardando..." : agentId ? "Guardar Cambios" : "Crear Agente"}
         </Button>
       </form>
     </Card>

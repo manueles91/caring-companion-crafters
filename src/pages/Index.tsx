@@ -7,12 +7,16 @@ import { Navigation } from "@/components/Navigation";
 import AgentHeader from "@/components/agents/AgentHeader";
 import AgentList from "@/components/agents/AgentList";
 import { v4 as uuidv4 } from 'uuid';
+import { useSearchParams } from 'react-router-dom';
 
 const Index = () => {
-  const [showCreateForm, setShowCreateForm] = React.useState(false);
+  const [searchParams] = useSearchParams();
   const [session, setSession] = React.useState(null);
   const [userRole, setUserRole] = React.useState<'user' | 'creator' | null>(null);
   const { toast } = useToast();
+
+  const showCreateForm = searchParams.get('create') === 'true';
+  const editAgentId = searchParams.get('edit');
 
   useEffect(() => {
     // Initialize guest ID if not exists
@@ -92,18 +96,18 @@ const Index = () => {
         <AgentHeader 
           userRole={userRole}
           showCreateForm={showCreateForm}
-          onCreateAgent={() => setShowCreateForm(true)}
+          onCreateAgent={() => {}}
           session={session}
         />
 
-        {showCreateForm ? (
+        {(showCreateForm || editAgentId) ? (
           <div className="mb-8">
-            <CreateAgentForm />
+            <CreateAgentForm agentId={editAgentId} />
           </div>
         ) : (
           <AgentList 
             userRole={userRole}
-            onCreateAgent={() => setShowCreateForm(true)}
+            onCreateAgent={() => {}}
           />
         )}
 
