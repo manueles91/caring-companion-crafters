@@ -3,23 +3,11 @@ import { Card } from "./ui/card";
 import { Input } from "./ui/input";
 import { Button } from "./ui/button";
 import { Textarea } from "./ui/textarea";
-import { Badge } from "./ui/badge";
-import { Plus, X } from "lucide-react";
 import { useToast } from "./ui/use-toast";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
-import { useQuery } from "@tanstack/react-query";
-
-const PERSONALITY_TRAITS = [
-  "Amigable",
-  "Paciente",
-  "Educativo",
-  "Comprensivo",
-  "Motivador",
-  "Empático",
-  "Juguetón",
-  "Estructurado",
-];
+import PersonalityTraits from "./agents/PersonalityTraits";
+import { useAgentData } from "@/hooks/useAgentData";
 
 interface CreateAgentFormProps {
   agentId?: string | null;
@@ -34,29 +22,16 @@ const CreateAgentForm = ({ agentId }: CreateAgentFormProps) => {
   const { toast } = useToast();
   const navigate = useNavigate();
 
-  const { data: agent } = useQuery({
-    queryKey: ['agent', agentId],
-    queryFn: async () => {
-      if (!agentId) return null;
-      const { data, error } = await supabase
-        .from('agents')
-        .select('*')
-        .eq('id', agentId)
-        .single();
-      
-      if (error) throw error;
-      return data;
-    },
-    enabled: !!agentId,
-    onSuccess: (data) => {
-      if (data) {
-        setName(data.name);
-        setDescription(data.description);
-        setInstructions(data.instructions || '');
-        setSelectedTraits(data.traits || []);
-      }
+  const handleDataLoaded = (data: any) => {
+    if (data) {
+      setName(data.name);
+      setDescription(data.description);
+      setInstructions(data.instructions || '');
+      setSelectedTraits(data.traits || []);
     }
-  });
+  };
+
+  useAgentData(agentId, handleDataLoaded);
 
   const toggleTrait = (trait: string) => {
     if (selectedTraits.includes(trait)) {
@@ -170,26 +145,10 @@ const CreateAgentForm = ({ agentId }: CreateAgentFormProps) => {
           />
         </div>
 
-        <div>
-          <label className="text-sm font-medium mb-2 block">Rasgos de Personalidad</label>
-          <div className="flex flex-wrap gap-2 mb-4">
-            {PERSONALITY_TRAITS.map((trait) => (
-              <Badge
-                key={trait}
-                variant={selectedTraits.includes(trait) ? "default" : "outline"}
-                className="cursor-pointer transition-all hover:opacity-80"
-                onClick={() => toggleTrait(trait)}
-              >
-                {selectedTraits.includes(trait) ? (
-                  <X className="h-3 w-3 mr-1" />
-                ) : (
-                  <Plus className="h-3 w-3 mr-1" />
-                )}
-                {trait}
-              </Badge>
-            ))}
-          </div>
-        </div>
+        <PersonalityTraits 
+          selectedTraits={selectedTraits}
+          onToggleTrait={toggleTrait}
+        />
 
         <div>
           <label className="text-sm font-medium mb-2 block">Instrucciones Iniciales</label>
