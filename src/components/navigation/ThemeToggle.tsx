@@ -3,13 +3,12 @@ import { Button } from "@/components/ui/button";
 import { useEffect, useState } from "react";
 
 export const ThemeToggle = () => {
+  const [mounted, setMounted] = useState(false);
   const [theme, setTheme] = useState<"light" | "dark">(() => {
-    // Check localStorage and system preference on initial render
     if (typeof window !== "undefined") {
       const stored = localStorage.getItem("theme");
       if (stored === "dark" || stored === "light") return stored;
       
-      // Check system preference
       if (window.matchMedia("(prefers-color-scheme: dark)").matches) {
         return "dark";
       }
@@ -17,8 +16,9 @@ export const ThemeToggle = () => {
     return "light";
   });
 
+  // Only run after mount to avoid hydration mismatch
   useEffect(() => {
-    // Initialize theme on mount
+    setMounted(true);
     const root = document.documentElement;
     if (theme === "dark") {
       root.classList.add("dark");
@@ -28,15 +28,15 @@ export const ThemeToggle = () => {
     localStorage.setItem("theme", theme);
   }, [theme]);
 
-  const toggleTheme = () => {
-    setTheme(prev => prev === "light" ? "dark" : "light");
-  };
+  if (!mounted) {
+    return null;
+  }
 
   return (
     <Button 
       variant="ghost" 
       size="icon"
-      onClick={toggleTheme}
+      onClick={() => setTheme(theme === "light" ? "dark" : "light")}
       className="h-7 w-7"
     >
       {theme === "dark" ? (
