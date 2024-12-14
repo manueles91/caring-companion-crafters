@@ -29,12 +29,18 @@ const AuthUI = () => {
         console.log("User updated");
       }
 
-      // Handle invalid credentials error from response
+      // Handle errors from response
       const error = session as any;
       if (error?.error?.message === "Invalid login credentials") {
         toast({
           title: "Authentication Error",
           description: "Invalid email or password. Please try again.",
+          variant: "destructive",
+        });
+      } else if (error?.error?.message?.includes("User already registered")) {
+        toast({
+          title: "Sign Up Error",
+          description: "This email is already registered. Please sign in instead.",
           variant: "destructive",
         });
       }
