@@ -2,12 +2,13 @@ import { Auth } from "@supabase/auth-ui-react";
 import { ThemeSupa } from "@supabase/auth-ui-shared";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 const AuthUI = () => {
   const { toast } = useToast();
   const navigate = useNavigate();
+  const [view, setView] = useState<"sign_in" | "sign_up">("sign_up");
 
   useEffect(() => {
     const {
@@ -45,6 +46,31 @@ const AuthUI = () => {
     };
   }, [toast, navigate]);
 
+  const handleAuthError = (error: Error) => {
+    console.error("Auth error:", error);
+    
+    try {
+      // Try to parse the error message if it's a stringified JSON
+      const errorBody = JSON.parse(error.message);
+      if (errorBody.code === "user_already_exists") {
+        toast({
+          title: "Account Already Exists",
+          description: "This email is already registered. Please sign in instead.",
+        });
+        setView("sign_in");
+        return;
+      }
+    } catch (e) {
+      // If error message isn't JSON or doesn't match expected format,
+      // show a generic error message
+      toast({
+        title: "Authentication Error",
+        description: error.message,
+        variant: "destructive",
+      });
+    }
+  };
+
   return (
     <div className="max-w-md w-full mx-auto p-6">
       <h2 className="text-2xl font-bold text-center mb-2">Welcome</h2>
@@ -65,11 +91,12 @@ const AuthUI = () => {
           },
         }}
         providers={[]}
-        view="sign_up"
+        view={view}
         theme="light"
         redirectTo={window.location.origin}
         onlyThirdPartyProviders={false}
         showLinks={true}
+        onError={handleAuthError}
       />
     </div>
   );
