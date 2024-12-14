@@ -34,9 +34,9 @@ const AgentHeader = ({ userRole, showCreateForm, onCreateAgent, session }: Agent
   };
 
   return (
-    <div className="flex justify-between items-center mb-8">
+    <div className="flex justify-between items-center">
       {!showCreateForm && (
-        <Button onClick={handleCreateAgent} className="gap-2 ml-auto">
+        <Button onClick={handleCreateAgent} className="gap-2 ml-auto hidden">
           <Plus className="h-4 w-4" />
           {t("agents.newAgent")}
         </Button>

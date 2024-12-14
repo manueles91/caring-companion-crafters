@@ -2,7 +2,7 @@ import React from "react";
 import { Card } from "./ui/card";
 import { Badge } from "./ui/badge";
 import { Avatar, AvatarImage, AvatarFallback } from "./ui/avatar";
-import { MessageSquare, UserRound } from "lucide-react";
+import { MessageSquare, UserRound, Edit } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
@@ -43,11 +43,23 @@ const AgentCard = ({ id, name, traits, onSelect }: AgentCardProps) => {
 
   const expertise = traits[0] || "General Assistant";
 
+  const handleEdit = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    // TODO: Implement edit functionality
+    console.log('Edit agent:', id);
+  };
+
   return (
     <Card 
-      className="p-3 hover:shadow-lg transition-all duration-300 animate-fade-in cursor-pointer"
+      className="p-3 hover:shadow-lg transition-all duration-300 animate-fade-in cursor-pointer relative"
       onClick={() => navigate(`/chat?agent=${id}`)}
     >
+      <button
+        onClick={handleEdit}
+        className="absolute top-2 right-2 p-1.5 rounded-full bg-accent hover:bg-accent/80 transition-colors"
+      >
+        <Edit className="h-4 w-4" />
+      </button>
       <div className="flex flex-col items-center text-center space-y-2">
         <Avatar className="w-16 h-16">
           <AvatarImage src={avatarUrl} alt={name} />
