@@ -3,6 +3,7 @@ import { Menu } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { UserActions } from "./UserActions";
+import { ThemeToggle } from "./ThemeToggle";
 
 interface NavigationMenuProps {
   session: any;
@@ -21,6 +22,10 @@ export const NavigationMenu = ({ session, open, onOpenChange }: NavigationMenuPr
       </SheetTrigger>
       <SheetContent side="right" className="w-64">
         <div className="flex flex-col gap-4 mt-8">
+          <div className="flex items-center justify-between px-2">
+            <span className="text-sm">Theme</span>
+            <ThemeToggle />
+          </div>
           <UserActions session={session} onAction={() => onOpenChange(false)} />
         </div>
       </SheetContent>
