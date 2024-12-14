@@ -7,7 +7,11 @@ import { useToast } from "./ui/use-toast";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { LanguageSelector } from "./LanguageSelector";
 
-export const Navigation = () => {
+interface NavigationProps {
+  session: any;
+}
+
+export const Navigation = ({ session }: NavigationProps) => {
   const navigate = useNavigate();
   const { toast } = useToast();
   const { t } = useLanguage();
@@ -49,15 +53,17 @@ export const Navigation = () => {
         
         <div className="flex items-center gap-2">
           <LanguageSelector />
-          <Button 
-            variant="ghost" 
-            size="icon"
-            onClick={handleSignOut}
-            className="text-muted-foreground hover:text-foreground"
-          >
-            <LogOut className="h-5 w-5" />
-            <span className="sr-only">{t("nav.signOut")}</span>
-          </Button>
+          {session && (
+            <Button 
+              variant="ghost" 
+              size="icon"
+              onClick={handleSignOut}
+              className="text-muted-foreground hover:text-foreground"
+            >
+              <LogOut className="h-5 w-5" />
+              <span className="sr-only">{t("nav.signOut")}</span>
+            </Button>
+          )}
         </div>
       </div>
     </nav>

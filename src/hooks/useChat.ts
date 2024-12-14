@@ -18,20 +18,40 @@ export const useChat = (agentId: string | null) => {
   const { toast } = useToast();
 
   useEffect(() => {
-    const checkAuth = async () => {
+    const checkAccess = async () => {
       const { data: { session } } = await supabase.auth.getSession();
       if (!session) {
-        toast({
-          title: "Error",
-          description: "Please log in to continue",
-          variant: "destructive",
-        });
-        navigate("/");
-        return;
+        const guestId = localStorage.getItem('guestId');
+        if (!guestId) {
+          toast({
+            title: "Error",
+            description: "Guest access not available",
+            variant: "destructive",
+          });
+          navigate("/");
+          return;
+        }
+
+        // Check guest interaction count
+        const { data: interactions, error } = await supabase
+          .from('guest_interactions')
+          .select('interaction_count')
+          .eq('guest_id', guestId)
+          .eq('agent_id', agentId)
+          .single();
+
+        if (!error && interactions?.interaction_count >= 5) {
+          toast({
+            title: "Sign up required",
+            description: "You've reached the maximum number of messages as a guest. Please sign up to continue.",
+          });
+          navigate("/");
+          return;
+        }
       }
     };
-    checkAuth();
-  }, [navigate, toast]);
+    checkAccess();
+  }, [navigate, toast, agentId]);
 
   useEffect(() => {
     const fetchAgent = async () => {
@@ -56,9 +76,6 @@ export const useChat = (agentId: string | null) => {
       }
 
       try {
-        const { data: { session } } = await supabase.auth.getSession();
-        if (!session) throw new Error("No authenticated session");
-
         const { data: agentData, error: agentError } = await supabase
           .from('agents')
           .select()
@@ -68,21 +85,24 @@ export const useChat = (agentId: string | null) => {
         if (agentError) throw agentError;
         setAgent(agentData);
 
-        const { data: messagesData, error: messagesError } = await supabase
-          .from('messages')
-          .select('role, content')
-          .eq('agent_id', agentId)
-          .eq('user_id', session.user.id)
-          .order('created_at', { ascending: true });
+        const { data: { session } } = await supabase.auth.getSession();
+        if (session) {
+          const { data: messagesData, error: messagesError } = await supabase
+            .from('messages')
+            .select('role, content')
+            .eq('agent_id', agentId)
+            .eq('user_id', session.user.id)
+            .order('created_at', { ascending: true });
 
-        if (messagesError) throw messagesError;
-        
-        const typedMessages: Message[] = messagesData.map(msg => ({
-          role: msg.role as "user" | "assistant",
-          content: msg.content
-        }));
-        
-        setMessages(typedMessages);
+          if (messagesError) throw messagesError;
+          
+          const typedMessages: Message[] = messagesData.map(msg => ({
+            role: msg.role as "user" | "assistant",
+            content: msg.content
+          }));
+          
+          setMessages(typedMessages);
+        }
       } catch (error) {
         console.error('Error al cargar datos:', error);
         toast({
@@ -97,23 +117,63 @@ export const useChat = (agentId: string | null) => {
     fetchAgent();
   }, [agentId, toast, navigate]);
 
+  const updateGuestInteraction = async () => {
+    const guestId = localStorage.getItem('guestId');
+    if (!guestId || !agent) return;
+
+    const { data, error } = await supabase
+      .from('guest_interactions')
+      .select('*')
+      .eq('guest_id', guestId)
+      .eq('agent_id', agent.id)
+      .single();
+
+    if (error) {
+      // If no record exists, create one
+      await supabase
+        .from('guest_interactions')
+        .insert({
+          guest_id: guestId,
+          agent_id: agent.id,
+          interaction_count: 1
+        });
+    } else {
+      // Update existing record
+      const newCount = (data.interaction_count || 0) + 1;
+      await supabase
+        .from('guest_interactions')
+        .update({ interaction_count: newCount })
+        .eq('id', data.id);
+
+      if (newCount >= 5) {
+        toast({
+          title: "Sign up required",
+          description: "You've reached the maximum number of messages as a guest. Please sign up to continue.",
+        });
+        navigate("/");
+        return false;
+      }
+    }
+    return true;
+  };
+
   const storeMessage = async (message: Message) => {
     if (!agent) return;
     
     try {
       const { data: { session } } = await supabase.auth.getSession();
-      if (!session) throw new Error("No authenticated session");
+      if (session) {
+        const { error } = await supabase
+          .from('messages')
+          .insert({
+            agent_id: agent.id,
+            role: message.role,
+            content: message.content,
+            user_id: session.user.id
+          });
 
-      const { error } = await supabase
-        .from('messages')
-        .insert({
-          agent_id: agent.id,
-          role: message.role,
-          content: message.content,
-          user_id: session.user.id
-        });
-
-      if (error) throw error;
+        if (error) throw error;
+      }
     } catch (error) {
       console.error('Error al guardar el mensaje:', error);
     }
@@ -122,13 +182,21 @@ export const useChat = (agentId: string | null) => {
   const handleSend = async () => {
     if (!input.trim() || !agent) return;
 
+    const { data: { session } } = await supabase.auth.getSession();
+    if (!session) {
+      const canProceed = await updateGuestInteraction();
+      if (!canProceed) return;
+    }
+
     const userMessage: Message = { role: "user", content: input };
     setMessages((prev) => [...prev, userMessage]);
     setInput("");
     setIsLoading(true);
 
     try {
-      await storeMessage(userMessage);
+      if (session) {
+        await storeMessage(userMessage);
+      }
 
       const { data, error } = await supabase.functions.invoke('chat', {
         body: {
@@ -149,7 +217,9 @@ export const useChat = (agentId: string | null) => {
         content: data.message 
       };
 
-      await storeMessage(assistantMessage);
+      if (session) {
+        await storeMessage(assistantMessage);
+      }
       
       setMessages((prev) => [...prev, assistantMessage]);
     } catch (error) {

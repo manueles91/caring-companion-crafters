@@ -50,6 +50,41 @@ export type Database = {
           },
         ]
       }
+      guest_interactions: {
+        Row: {
+          agent_id: string
+          created_at: string | null
+          guest_id: string
+          id: string
+          interaction_count: number | null
+          updated_at: string | null
+        }
+        Insert: {
+          agent_id: string
+          created_at?: string | null
+          guest_id: string
+          id?: string
+          interaction_count?: number | null
+          updated_at?: string | null
+        }
+        Update: {
+          agent_id?: string
+          created_at?: string | null
+          guest_id?: string
+          id?: string
+          interaction_count?: number | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "guest_interactions_agent_id_fkey"
+            columns: ["agent_id"]
+            isOneToOne: false
+            referencedRelation: "agents"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       messages: {
         Row: {
           agent_id: string

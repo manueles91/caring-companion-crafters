@@ -6,6 +6,7 @@ import { useToast } from "@/components/ui/use-toast";
 import { Navigation } from "@/components/Navigation";
 import AgentHeader from "@/components/agents/AgentHeader";
 import AgentList from "@/components/agents/AgentList";
+import { v4 as uuidv4 } from 'uuid';
 
 const Index = () => {
   const [showCreateForm, setShowCreateForm] = React.useState(false);
@@ -14,6 +15,11 @@ const Index = () => {
   const { toast } = useToast();
 
   useEffect(() => {
+    // Initialize guest ID if not exists
+    if (!localStorage.getItem('guestId')) {
+      localStorage.setItem('guestId', uuidv4());
+    }
+
     supabase.auth.getSession().then(({ data: { session } }) => {
       setSession(session);
       if (session?.user) {
@@ -79,29 +85,55 @@ const Index = () => {
     }
   };
 
-  if (!session) {
-    return <AuthUI />;
-  }
-
   return (
     <div className="min-h-screen bg-background">
-      <Navigation />
+      <Navigation session={session} />
       <div className="container mx-auto px-4 py-8 pt-24">
-        <AgentHeader 
-          userRole={userRole}
-          showCreateForm={showCreateForm}
-          onCreateAgent={() => setShowCreateForm(true)}
-        />
+        {session ? (
+          <>
+            <AgentHeader 
+              userRole={userRole}
+              showCreateForm={showCreateForm}
+              onCreateAgent={() => setShowCreateForm(true)}
+            />
 
-        {showCreateForm ? (
-          <div className="mb-8">
-            <CreateAgentForm />
-          </div>
+            {showCreateForm ? (
+              <div className="mb-8">
+                <CreateAgentForm />
+              </div>
+            ) : (
+              <AgentList 
+                userRole={userRole}
+                onCreateAgent={() => setShowCreateForm(true)}
+              />
+            )}
+          </>
         ) : (
-          <AgentList 
-            userRole={userRole}
-            onCreateAgent={() => setShowCreateForm(true)}
-          />
+          <div>
+            <h1 className="text-2xl font-bold mb-6">Welcome! Try chatting with our agents</h1>
+            <p className="text-muted-foreground mb-8">
+              You can chat with our agents as a guest. After 5 messages, you'll need to sign up to continue.
+            </p>
+            <AgentList 
+              userRole={null}
+              onCreateAgent={() => {
+                toast({
+                  title: "Sign up required",
+                  description: "Please sign up to create new agents",
+                });
+              }}
+            />
+            <div className="mt-8 p-6 bg-muted rounded-lg">
+              <h2 className="text-xl font-semibold mb-4">Want to do more?</h2>
+              <p className="mb-4">Sign up to:</p>
+              <ul className="list-disc list-inside mb-6 space-y-2">
+                <li>Continue conversations after 5 messages</li>
+                <li>Create your own agents</li>
+                <li>Save your chat history</li>
+              </ul>
+              <AuthUI />
+            </div>
+          </div>
         )}
       </div>
     </div>
