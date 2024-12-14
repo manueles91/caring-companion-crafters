@@ -6,6 +6,7 @@ import { useToast } from "@/components/ui/use-toast";
 import { Navigation } from "@/components/Navigation";
 import AgentHeader from "@/components/agents/AgentHeader";
 import AgentList from "@/components/agents/AgentList";
+import FeaturesCarousel from "@/components/features/FeaturesCarousel";
 import { v4 as uuidv4 } from 'uuid';
 import { useSearchParams } from 'react-router-dom';
 
@@ -112,16 +113,19 @@ const Index = () => {
         )}
 
         {!session && (
-          <div id="auth-section" className="mt-8 p-6 bg-muted rounded-lg scroll-mt-24">
-            <h2 className="text-xl font-semibold mb-4">Want to do more?</h2>
-            <p className="mb-4">Sign up to:</p>
-            <ul className="list-disc list-inside mb-6 space-y-2">
-              <li>Continue conversations after 5 messages</li>
-              <li>Create your own agents</li>
-              <li>Save your chat history</li>
-            </ul>
-            <AuthUI />
-          </div>
+          <>
+            <FeaturesCarousel />
+            <div id="auth-section" className="mt-8 p-6 bg-muted rounded-lg scroll-mt-24">
+              <h2 className="text-xl font-semibold mb-4">Want to do more?</h2>
+              <p className="mb-4">Sign up to:</p>
+              <ul className="list-disc list-inside mb-6 space-y-2">
+                <li>Continue conversations after 5 messages</li>
+                <li>Create your own agents</li>
+                <li>Save your chat history</li>
+              </ul>
+              <AuthUI />
+            </div>
+          </>
         )}
       </div>
     </div>
