@@ -1,18 +1,11 @@
 import React from "react";
-import { Plus } from "lucide-react";
-import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
-import AgentCard from "@/components/AgentCard";
-import { useLanguage } from "@/contexts/LanguageContext";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import {
-  Carousel,
-  CarouselContent,
-  CarouselItem,
-  CarouselNext,
-  CarouselPrevious,
-} from "@/components/ui/carousel";
+import NoAgentsView from "./views/NoAgentsView";
+import CarouselView from "./views/CarouselView";
+import GridView from "./views/GridView";
+import { Agent } from "@/types/agent";
 
 interface AgentListProps {
   userRole: 'user' | 'creator' | null;
@@ -20,8 +13,6 @@ interface AgentListProps {
 }
 
 const AgentList = ({ userRole, onCreateAgent }: AgentListProps) => {
-  const { t } = useLanguage();
-
   const { data: agents, isLoading } = useQuery({
     queryKey: ['agents'],
     queryFn: async () => {
@@ -31,7 +22,7 @@ const AgentList = ({ userRole, onCreateAgent }: AgentListProps) => {
         .order('created_at', { ascending: false });
       
       if (error) throw error;
-      return data;
+      return data as Agent[];
     },
   });
 
@@ -48,76 +39,16 @@ const AgentList = ({ userRole, onCreateAgent }: AgentListProps) => {
   }
 
   if (!agents?.length) {
-    return (
-      <div className="text-center py-12">
-        <h3 className="text-lg font-semibold mb-2">{t("agents.noAgents")}</h3>
-        <p className="text-muted-foreground mb-4">
-          {userRole === 'creator' 
-            ? t("agents.noAgents.creator")
-            : t("agents.noAgents.user")}
-        </p>
-        {userRole === 'creator' && (
-          <Button onClick={onCreateAgent} className="gap-2">
-            <Plus className="h-4 w-4" />
-            {t("agents.newAgent")}
-          </Button>
-        )}
-      </div>
-    );
+    return <NoAgentsView userRole={userRole} onCreateAgent={onCreateAgent} />;
   }
 
   // Show carousel for signed out users
   if (!userRole) {
-    return (
-      <div className="container mx-auto relative">
-        <Carousel
-          opts={{
-            align: "start",
-            loop: true,
-            slidesToScroll: 1,
-            containScroll: "trimSnaps"
-          }}
-          className="w-full"
-        >
-          <CarouselContent className="-ml-2 md:-ml-4">
-            {agents.map((agent) => (
-              <CarouselItem key={agent.id} className="pl-2 md:pl-4 basis-[40%] md:basis-[33%] lg:basis-[25%]">
-                <AgentCard
-                  id={agent.id}
-                  name={agent.name}
-                  expertise={agent.expertise}
-                  traits={agent.traits || []}
-                  onSelect={() => console.log("Selected agent:", agent.name)}
-                />
-              </CarouselItem>
-            ))}
-          </CarouselContent>
-          <div className="hidden sm:block">
-            <CarouselPrevious className="-left-12" />
-            <CarouselNext className="-right-12" />
-          </div>
-        </Carousel>
-      </div>
-    );
+    return <CarouselView agents={agents} />;
   }
 
   // Show grid for signed in users
-  return (
-    <div className="container mx-auto px-2">
-      <div className="grid grid-cols-3 gap-3">
-        {agents.map((agent) => (
-          <AgentCard
-            key={agent.id}
-            id={agent.id}
-            name={agent.name}
-            expertise={agent.expertise}
-            traits={agent.traits || []}
-            onSelect={() => console.log("Selected agent:", agent.name)}
-          />
-        ))}
-      </div>
-    </div>
-  );
+  return <GridView agents={agents} />;
 };
 
 export default AgentList;
