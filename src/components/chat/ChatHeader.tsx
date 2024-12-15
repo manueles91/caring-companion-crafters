@@ -40,7 +40,7 @@ const ChatHeader = ({ agent }: ChatHeaderProps) => {
             <UserRound className="w-4 h-4" />
           </AvatarFallback>
         </Avatar>
-        <h1 className="text-2xl font-bold">Chat with {agent?.name}</h1>
+        <h1 className="text-2xl font-bold">{agent?.name}</h1>
       </div>
       <div className="w-10" /> {/* Spacer to balance the back button */}
     </div>
