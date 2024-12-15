@@ -61,9 +61,6 @@ const FeaturesCarousel = () => {
   return (
     <div className="w-full py-12 bg-secondary/50">
       <div className="container">
-        <h2 className="text-2xl font-semibold text-center mb-8">
-          {t("features.title")}
-        </h2>
         <Carousel
           opts={{
             align: "start",
