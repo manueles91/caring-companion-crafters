@@ -19,16 +19,16 @@ export const LanguageSelector = () => {
           <span className="sr-only">Select language</span>
         </Button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent align="end" className="bg-background dark:bg-accent">
+      <DropdownMenuContent align="end" className="bg-background border-border dark:bg-[#1A1F2C] dark:border-[#403E43]">
         <DropdownMenuItem 
           onClick={() => setLanguage('en')}
-          className="hover:bg-accent dark:hover:bg-muted"
+          className="hover:bg-accent dark:hover:bg-[#403E43] dark:text-white dark:focus:bg-[#403E43] dark:focus:text-white"
         >
           <span className={`mr-2 ${language === 'en' ? 'font-bold' : ''}`}>English</span>
         </DropdownMenuItem>
         <DropdownMenuItem 
           onClick={() => setLanguage('es')}
-          className="hover:bg-accent dark:hover:bg-muted"
+          className="hover:bg-accent dark:hover:bg-[#403E43] dark:text-white dark:focus:bg-[#403E43] dark:focus:text-white"
         >
           <span className={`mr-2 ${language === 'es' ? 'font-bold' : ''}`}>Español</span>
         </DropdownMenuItem>
