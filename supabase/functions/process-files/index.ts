@@ -1,7 +1,7 @@
 import "https://deno.land/x/xhr@0.1.0/mod.ts";
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.7.1';
-import { PDFDocument } from 'https://cdn.skypack.dev/pdf-lib';
+import * as pdfjs from 'https://cdn.skypack.dev/pdfjs-dist@3.11.174/build/pdf.min.js';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -61,18 +61,37 @@ serve(async (req) => {
     if (file.type === 'application/pdf') {
       console.log('Extracting content from PDF using OpenAI');
       
-      // Convert PDF to PNG
+      // Convert PDF to PNG using pdf.js
       const arrayBuffer = await file.arrayBuffer();
-      const pdfDoc = await PDFDocument.load(arrayBuffer);
-      const pages = pdfDoc.getPages();
-      const firstPage = pages[0];
-      const pngImage = await firstPage.exportAsPNG();
+      const loadingTask = pdfjs.getDocument({ data: arrayBuffer });
+      const pdf = await loadingTask.promise;
+      const page = await pdf.getPage(1);
+      
+      const scale = 1.5;
+      const viewport = page.getViewport({ scale });
+      
+      // Create canvas
+      const canvas = new OffscreenCanvas(viewport.width, viewport.height);
+      const context = canvas.getContext('2d');
+      
+      if (!context) {
+        throw new Error('Could not get canvas context');
+      }
+      
+      // Render PDF page to canvas
+      await page.render({
+        canvasContext: context,
+        viewport: viewport
+      }).promise;
+      
+      // Convert canvas to blob
+      const blob = await canvas.convertToBlob({ type: 'image/png' });
       
       // Upload PNG to storage
       const pngPath = `${agentId}/${crypto.randomUUID()}.png`;
       const { data: pngUpload, error: pngError } = await supabase.storage
         .from('agent-files')
-        .upload(pngPath, pngImage, {
+        .upload(pngPath, blob, {
           contentType: 'image/png',
           upsert: false
         });
