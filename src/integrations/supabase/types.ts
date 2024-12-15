@@ -94,6 +94,38 @@ export type Database = {
           },
         ]
       }
+      file_contents: {
+        Row: {
+          content: string
+          created_at: string | null
+          file_id: string
+          id: string
+          updated_at: string | null
+        }
+        Insert: {
+          content: string
+          created_at?: string | null
+          file_id: string
+          id?: string
+          updated_at?: string | null
+        }
+        Update: {
+          content?: string
+          created_at?: string | null
+          file_id?: string
+          id?: string
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "file_contents_file_id_fkey"
+            columns: ["file_id"]
+            isOneToOne: false
+            referencedRelation: "agent_files"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       guest_interactions: {
         Row: {
           agent_id: string

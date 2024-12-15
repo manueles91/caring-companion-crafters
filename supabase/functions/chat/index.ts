@@ -21,7 +21,6 @@ serve(async (req) => {
 
     const { messages, agent } = await req.json();
     
-    // Validate agent and agent.id
     if (!agent || !agent.id) {
       console.error('Invalid agent data received:', agent);
       throw new Error('Invalid agent data: missing agent ID');
@@ -34,10 +33,17 @@ serve(async (req) => {
       Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
     );
 
-    // Fetch agent's files
+    // Fetch agent's files and their contents
     const { data: files, error: filesError } = await supabase
       .from('agent_files')
-      .select('*')
+      .select(`
+        id,
+        filename,
+        content_type,
+        file_contents (
+          content
+        )
+      `)
       .eq('agent_id', agent.id);
 
     if (filesError) {
@@ -51,31 +57,27 @@ serve(async (req) => {
       console.log('Found files for agent:', files.length);
       
       for (const file of files) {
-        try {
-          // Download file content from storage
-          const { data: fileData, error: downloadError } = await supabase
-            .storage
-            .from('agent-files')
-            .download(file.file_path);
-
-          if (downloadError) {
-            console.error('Error downloading file:', downloadError);
-            continue;
-          }
-
-          // Convert file content to text
-          let fileContent = '';
-          if (file.content_type === 'application/pdf') {
-            // For PDFs, we'll need to extract text - for now just mention it
-            fileContent = `[Content from PDF file: ${file.filename}]`;
-          } else {
-            // For text files, read the content
-            fileContent = await fileData.text();
-          }
-
+        const fileContent = file.file_contents?.[0]?.content;
+        if (fileContent) {
           filesContext += `\nContent from ${file.filename}:\n${fileContent}\n`;
-        } catch (error) {
-          console.error('Error processing file:', file.filename, error);
+        } else if (file.content_type !== 'application/pdf') {
+          try {
+            // Download non-PDF file content from storage
+            const { data: fileData, error: downloadError } = await supabase
+              .storage
+              .from('agent-files')
+              .download(file.file_path);
+
+            if (downloadError) {
+              console.error('Error downloading file:', downloadError);
+              continue;
+            }
+
+            const textContent = await fileData.text();
+            filesContext += `\nContent from ${file.filename}:\n${textContent}\n`;
+          } catch (error) {
+            console.error('Error processing file:', file.filename, error);
+          }
         }
       }
     }

@@ -1,6 +1,7 @@
 import "https://deno.land/x/xhr@0.1.0/mod.ts";
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.7.1';
+import { PDFDocument } from 'https://cdn.skypack.dev/pdf-lib';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -21,6 +22,8 @@ serve(async (req) => {
       throw new Error('Missing required fields');
     }
 
+    console.log('Processing file:', file.name, 'for agent:', agentId);
+
     const supabase = createClient(
       Deno.env.get('SUPABASE_URL') ?? '',
       Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
@@ -29,6 +32,7 @@ serve(async (req) => {
     const fileExt = file.name.split('.').pop();
     const filePath = `${agentId}/${crypto.randomUUID()}.${fileExt}`;
 
+    // Upload file to storage
     const { data: uploadData, error: uploadError } = await supabase.storage
       .from('agent-files')
       .upload(filePath, file, {
@@ -38,7 +42,8 @@ serve(async (req) => {
 
     if (uploadError) throw uploadError;
 
-    const { error: dbError } = await supabase
+    // Insert file record
+    const { data: fileRecord, error: dbError } = await supabase
       .from('agent_files')
       .insert({
         agent_id: agentId,
@@ -46,15 +51,44 @@ serve(async (req) => {
         file_path: filePath,
         content_type: file.type,
         size: file.size
-      });
+      })
+      .select()
+      .single();
 
     if (dbError) throw dbError;
+
+    // Extract content if PDF
+    if (file.type === 'application/pdf') {
+      console.log('Extracting content from PDF');
+      const arrayBuffer = await file.arrayBuffer();
+      const pdfDoc = await PDFDocument.load(arrayBuffer);
+      const pages = pdfDoc.getPages();
+      let content = '';
+
+      for (let i = 0; i < pages.length; i++) {
+        const page = pages[i];
+        const text = await page.doc.getText();
+        content += text + '\n';
+      }
+
+      // Store extracted content
+      const { error: contentError } = await supabase
+        .from('file_contents')
+        .insert({
+          file_id: fileRecord.id,
+          content: content
+        });
+
+      if (contentError) throw contentError;
+      console.log('PDF content extracted and stored successfully');
+    }
 
     return new Response(
       JSON.stringify({ success: true, filePath }),
       { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     );
   } catch (error) {
+    console.error('Error processing file:', error);
     return new Response(
       JSON.stringify({ error: error.message }),
       { 
