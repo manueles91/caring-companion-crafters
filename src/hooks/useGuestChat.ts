@@ -32,6 +32,7 @@ export const useGuestChat = (agent: Agent | null) => {
         .eq('agent_id', agent.id)
         .maybeSingle();
 
+      // Show prompt if there's already one interaction (before second message)
       if (interactions?.interaction_count === 1) {
         setShowGuestPrompt(true);
         return false;
