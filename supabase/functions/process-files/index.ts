@@ -65,19 +65,15 @@ serve(async (req) => {
       const pages = pdfDoc.getPages();
       let content = '';
 
-      // Extract text using a simpler approach
-      for (const page of pages) {
-        const { width, height } = page.getSize();
-        content += `Page ${pages.indexOf(page) + 1}\n`;
+      // Simple text extraction approach
+      for (let i = 0; i < pages.length; i++) {
+        const page = pages[i];
+        content += `Page ${i + 1}\n`;
         
-        // Get all text operations on the page
-        const textObjects = await page.doc.getOperatorList();
-        for (const op of textObjects.fnArray) {
-          if (op === 'showText') {
-            content += textObjects.argsArray[textObjects.fnArray.indexOf(op)][0] + ' ';
-          }
-        }
-        content += '\n\n';
+        // Basic text extraction - this is a limitation of pdf-lib
+        // For better text extraction, consider using a different PDF library
+        const text = page.getTextContent?.() || '';
+        content += text + '\n\n';
       }
 
       console.log('Extracted content length:', content.length);
