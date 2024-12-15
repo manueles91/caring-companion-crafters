@@ -93,14 +93,6 @@ const CreateAgentForm = ({ agentId }: CreateAgentFormProps) => {
 
         <div className="space-y-4">
           <div className="flex gap-4 justify-center">
-            <Button 
-              type="submit" 
-              className="flex-1"
-              disabled={isSubmitting}
-            >
-              {isSubmitting ? "Guardando..." : agentId ? "Guardar Cambios" : "Crear Agente"}
-            </Button>
-
             <Button
               type="button"
               variant="secondary"
@@ -108,6 +100,14 @@ const CreateAgentForm = ({ agentId }: CreateAgentFormProps) => {
               onClick={() => navigate('/')}
             >
               Cancelar
+            </Button>
+
+            <Button 
+              type="submit" 
+              className="flex-1"
+              disabled={isSubmitting}
+            >
+              {isSubmitting ? "Guardando..." : agentId ? "Guardar Cambios" : "Crear Agente"}
             </Button>
           </div>
 
