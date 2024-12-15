@@ -31,6 +31,10 @@ export const useGuestInteractions = () => {
         title: "Sign up required",
         description: "You've reached the maximum number of messages as a guest. Please sign up to continue.",
       });
+      window.scrollTo({
+        top: document.documentElement.scrollHeight,
+        behavior: 'smooth'
+      });
       navigate("/");
       return false;
     }
@@ -68,6 +72,10 @@ export const useGuestInteractions = () => {
         toast({
           title: "Sign up required",
           description: "You've reached the maximum number of messages as a guest. Please sign up to continue.",
+        });
+        window.scrollTo({
+          top: document.documentElement.scrollHeight,
+          behavior: 'smooth'
         });
         navigate("/");
         return false;
