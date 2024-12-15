@@ -87,14 +87,17 @@ serve(async (req) => {
         
         console.log('PDF content extracted and stored successfully');
       } catch (pdfError) {
-        console.error('Error extracting PDF content:', pdfError);
-        // Don't throw here, we still want to return success for the file upload
-        // Just log the error and continue
+        console.error('Error processing PDF:', pdfError);
+        // Don't throw here - we want the file upload to succeed even if PDF processing fails
       }
     }
 
     return new Response(
-      JSON.stringify({ success: true, filePath }),
+      JSON.stringify({ 
+        success: true, 
+        message: 'File processed successfully',
+        filePath 
+      }),
       { 
         headers: { 
           ...corsHeaders, 
@@ -105,7 +108,10 @@ serve(async (req) => {
   } catch (error) {
     console.error('Error processing file:', error);
     return new Response(
-      JSON.stringify({ error: error.message }),
+      JSON.stringify({ 
+        error: error.message || 'An unexpected error occurred',
+        details: error.toString()
+      }),
       { 
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
         status: 400 
