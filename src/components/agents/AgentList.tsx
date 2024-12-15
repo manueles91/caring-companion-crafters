@@ -69,11 +69,19 @@ const AgentList = ({ userRole, onCreateAgent }: AgentListProps) => {
   // Show carousel for signed out users
   if (!userRole) {
     return (
-      <div className="container mx-auto px-2">
-        <Carousel className="w-full max-w-xs mx-auto sm:max-w-sm md:max-w-md">
-          <CarouselContent>
+      <div className="container mx-auto px-8 relative">
+        <Carousel
+          opts={{
+            align: "start",
+            loop: true,
+            slidesToScroll: 1,
+            containScroll: "trimSnaps"
+          }}
+          className="w-full"
+        >
+          <CarouselContent className="-ml-2 md:-ml-4">
             {agents.map((agent) => (
-              <CarouselItem key={agent.id}>
+              <CarouselItem key={agent.id} className="pl-2 md:pl-4 basis-full md:basis-1/3 lg:basis-1/3">
                 <AgentCard
                   id={agent.id}
                   name={agent.name}
@@ -84,8 +92,10 @@ const AgentList = ({ userRole, onCreateAgent }: AgentListProps) => {
               </CarouselItem>
             ))}
           </CarouselContent>
-          <CarouselPrevious />
-          <CarouselNext />
+          <div className="hidden sm:block">
+            <CarouselPrevious className="-left-12" />
+            <CarouselNext className="-right-12" />
+          </div>
         </Carousel>
       </div>
     );
