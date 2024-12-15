@@ -65,6 +65,8 @@ serve(async (req) => {
         .from('agent-files')
         .getPublicUrl(filePath);
 
+      console.log('Public URL:', publicUrl);
+
       const openAIResponse = await fetch('https://api.openai.com/v1/chat/completions', {
         method: 'POST',
         headers: {
@@ -83,7 +85,10 @@ serve(async (req) => {
                 },
                 {
                   type: "image_url",
-                  image_url: publicUrl
+                  image_url: {
+                    url: publicUrl,
+                    detail: "high"
+                  }
                 }
               ]
             }
