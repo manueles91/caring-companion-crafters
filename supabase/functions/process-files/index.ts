@@ -9,6 +9,7 @@ const corsHeaders = {
 };
 
 serve(async (req) => {
+  // Handle CORS preflight requests
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
   }
@@ -87,13 +88,19 @@ serve(async (req) => {
         console.log('PDF content extracted and stored successfully');
       } catch (pdfError) {
         console.error('Error extracting PDF content:', pdfError);
-        throw new Error(`Failed to extract PDF content: ${pdfError.message}`);
+        // Don't throw here, we still want to return success for the file upload
+        // Just log the error and continue
       }
     }
 
     return new Response(
       JSON.stringify({ success: true, filePath }),
-      { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      { 
+        headers: { 
+          ...corsHeaders, 
+          'Content-Type': 'application/json' 
+        } 
+      }
     );
   } catch (error) {
     console.error('Error processing file:', error);
