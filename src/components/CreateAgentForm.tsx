@@ -38,6 +38,20 @@ const CreateAgentForm = ({ agentId }: CreateAgentFormProps) => {
     if (!agentId) return;
 
     try {
+      // Get current user session
+      const { data: { session } } = await supabase.auth.getSession();
+      console.log('Current session:', session);
+
+      // Get the agent details to verify creator
+      const { data: agent } = await supabase
+        .from('agents')
+        .select('creator_id')
+        .eq('id', agentId)
+        .single();
+      
+      console.log('Agent details:', agent);
+      console.log('Current user ID:', session?.user?.id);
+
       const { error } = await supabase
         .from('agents')
         .delete()
@@ -58,7 +72,7 @@ const CreateAgentForm = ({ agentId }: CreateAgentFormProps) => {
       console.error('Error deleting agent:', error);
       toast({
         title: "Error",
-        description: "No se pudo eliminar el agente",
+        description: "No se pudo eliminar el agente. Verifica que seas el creador.",
         variant: "destructive",
       });
     }
