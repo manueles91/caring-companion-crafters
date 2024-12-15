@@ -16,6 +16,7 @@ interface CreateAgentFormProps {
 const CreateAgentForm = ({ agentId }: CreateAgentFormProps) => {
   const [selectedTraits, setSelectedTraits] = React.useState<string[]>([]);
   const [name, setName] = React.useState("");
+  const [expertise, setExpertise] = React.useState("");
   const [description, setDescription] = React.useState("");
   const [instructions, setInstructions] = React.useState("");
   const [isSubmitting, setIsSubmitting] = React.useState(false);
@@ -41,9 +42,10 @@ const CreateAgentForm = ({ agentId }: CreateAgentFormProps) => {
   React.useEffect(() => {
     if (agentData) {
       setName(agentData.name || '');
+      setExpertise(agentData.traits?.[0] || '');
       setDescription(agentData.description || '');
       setInstructions(agentData.instructions || '');
-      setSelectedTraits(agentData.traits || []);
+      setSelectedTraits(agentData.traits?.slice(1) || []);
     }
   }, [agentData]);
 
@@ -78,7 +80,7 @@ const CreateAgentForm = ({ agentId }: CreateAgentFormProps) => {
         name,
         description,
         instructions: instructions || null,
-        traits: selectedTraits,
+        traits: [expertise, ...selectedTraits],
       };
 
       if (agentId) {
@@ -118,6 +120,8 @@ const CreateAgentForm = ({ agentId }: CreateAgentFormProps) => {
         <AgentFormFields
           name={name}
           setName={setName}
+          expertise={expertise}
+          setExpertise={setExpertise}
           description={description}
           setDescription={setDescription}
           instructions={instructions}

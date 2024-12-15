@@ -6,6 +6,8 @@ import PersonalityTraits from "./PersonalityTraits";
 interface AgentFormFieldsProps {
   name: string;
   setName: (value: string) => void;
+  expertise: string;
+  setExpertise: (value: string) => void;
   description: string;
   setDescription: (value: string) => void;
   instructions: string;
@@ -17,6 +19,8 @@ interface AgentFormFieldsProps {
 const AgentFormFields = ({
   name,
   setName,
+  expertise,
+  setExpertise,
   description,
   setDescription,
   instructions,
@@ -32,6 +36,16 @@ const AgentFormFields = ({
           placeholder="Ingresa el nombre del agente..." 
           value={name}
           onChange={(e) => setName(e.target.value)}
+          required
+        />
+      </div>
+
+      <div>
+        <label className="text-sm font-medium mb-2 block">Tema/Expertise *</label>
+        <Input 
+          placeholder="Ingresa el tema o expertise principal..." 
+          value={expertise}
+          onChange={(e) => setExpertise(e.target.value)}
           required
         />
       </div>
