@@ -39,10 +39,17 @@ export const messageService = {
   },
 
   sendMessageToAgent: async (messages: Message[], agent: Agent) => {
+    if (!agent?.id) {
+      throw new Error('Agent ID is required');
+    }
+
+    console.log('Sending message to agent:', agent.id);
+
     const { data, error } = await supabase.functions.invoke('chat', {
       body: {
         messages,
         agent: {
+          id: agent.id,
           name: agent.name,
           description: agent.description,
           instructions: agent.instructions,
@@ -51,7 +58,11 @@ export const messageService = {
       },
     });
 
-    if (error) throw error;
+    if (error) {
+      console.error('Error calling chat function:', error);
+      throw error;
+    }
+
     return data.message;
   }
 };
