@@ -6,6 +6,7 @@ import NoAgentsView from "./views/NoAgentsView";
 import CarouselView from "./views/CarouselView";
 import GridView from "./views/GridView";
 import { Agent } from "@/types/agent";
+import { useAuthStore } from "@/stores/authStore";
 
 interface AgentListProps {
   userRole: 'user' | 'creator' | null;
@@ -13,6 +14,8 @@ interface AgentListProps {
 }
 
 const AgentList = ({ userRole, onCreateAgent }: AgentListProps) => {
+  const { session } = useAuthStore();
+
   const { data: agents, isLoading } = useQuery({
     queryKey: ['agents'],
     queryFn: async () => {
@@ -43,7 +46,7 @@ const AgentList = ({ userRole, onCreateAgent }: AgentListProps) => {
   }
 
   // Show carousel for signed out users
-  if (!userRole) {
+  if (!session) {
     return <CarouselView agents={agents} />;
   }
 
