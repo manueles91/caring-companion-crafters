@@ -9,65 +9,37 @@ const corsHeaders = {
 };
 
 serve(async (req) => {
-  // Handle CORS preflight requests
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
   }
 
   try {
     console.log('Processing file upload request');
-    const { file, agentId } = await req.json();
+    const { filename, filePath, contentType, size, agentId } = await req.json();
     
-    if (!file || !agentId) {
-      console.error('Missing required fields:', { file: !!file, agentId: !!agentId });
+    if (!filename || !filePath || !agentId) {
+      console.error('Missing required fields:', { filename, filePath, agentId });
       throw new Error('Missing required fields');
     }
 
-    console.log('Processing file:', file.name, 'for agent:', agentId);
-
-    // Convert base64 to Blob/ArrayBuffer
-    const base64Data = file.base64.split(',')[1];
-    const binaryData = atob(base64Data);
-    const bytes = new Uint8Array(binaryData.length);
-    for (let i = 0; i < binaryData.length; i++) {
-      bytes[i] = binaryData.charCodeAt(i);
-    }
-    const blob = new Blob([bytes], { type: file.type });
+    console.log('Processing file:', filename, 'for agent:', agentId);
 
     const supabase = createClient(
       Deno.env.get('SUPABASE_URL') ?? '',
       Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
     );
 
-    const fileExt = file.name.split('.').pop();
-    const filePath = `${agentId}/${crypto.randomUUID()}.${fileExt}`;
-
-    console.log('Uploading file to storage:', filePath);
-
-    // Upload original file to storage
-    const { data: uploadData, error: uploadError } = await supabase.storage
-      .from('agent-files')
-      .upload(filePath, blob, {
-        contentType: file.type,
-        upsert: false
-      });
-
-    if (uploadError) {
-      console.error('Error uploading to storage:', uploadError);
-      throw uploadError;
-    }
-
-    console.log('File uploaded successfully, creating database record');
+    console.log('Creating database record');
 
     // Insert file record
     const { data: fileRecord, error: dbError } = await supabase
       .from('agent_files')
       .insert({
         agent_id: agentId,
-        filename: file.name,
+        filename,
         file_path: filePath,
-        content_type: file.type,
-        size: file.size
+        content_type: contentType,
+        size
       })
       .select()
       .single();
@@ -78,12 +50,23 @@ serve(async (req) => {
     }
 
     // Extract content if PDF
-    if (file.type === 'application/pdf') {
+    if (contentType === 'application/pdf') {
       console.log('Extracting content from PDF');
       
       try {
-        const dataBuffer = bytes.buffer;
-        const pdfData = await pdfParse(dataBuffer);
+        // Download the file from storage
+        const { data: fileData, error: downloadError } = await supabase
+          .storage
+          .from('agent-files')
+          .download(filePath);
+
+        if (downloadError) {
+          console.error('Error downloading file:', downloadError);
+          throw downloadError;
+        }
+
+        const arrayBuffer = await fileData.arrayBuffer();
+        const pdfData = await pdfParse(arrayBuffer);
         const extractedText = pdfData.text;
         
         console.log('Extracted text length:', extractedText.length);

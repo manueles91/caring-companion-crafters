@@ -24,30 +24,33 @@ const FileUpload = ({ agentId, onUploadComplete }: FileUploadProps) => {
       const { data: { session } } = await supabase.auth.getSession();
       if (!session) throw new Error('No authenticated session');
 
-      // Convert file to base64
-      const reader = new FileReader();
-      const filePromise = new Promise((resolve, reject) => {
-        reader.onload = () => resolve(reader.result);
-        reader.onerror = reject;
-        reader.readAsDataURL(file);
-      });
+      // First upload the file to Supabase Storage
+      const fileExt = file.name.split('.').pop();
+      const filePath = `${agentId}/${crypto.randomUUID()}.${fileExt}`;
 
-      const base64File = await filePromise;
-      console.log('File converted to base64, sending to Edge Function');
-      
-      const { error } = await supabase.functions.invoke('process-files', {
+      const { error: uploadError } = await supabase.storage
+        .from('agent-files')
+        .upload(filePath, file, {
+          contentType: file.type,
+          upsert: false
+        });
+
+      if (uploadError) throw uploadError;
+
+      console.log('File uploaded to storage, processing file...');
+
+      // Now call the edge function to process the file
+      const { error: processError } = await supabase.functions.invoke('process-files', {
         body: {
-          file: {
-            name: file.name,
-            type: file.type,
-            size: file.size,
-            base64: base64File
-          },
+          filename: file.name,
+          filePath,
+          contentType: file.type,
+          size: file.size,
           agentId
         }
       });
 
-      if (error) throw error;
+      if (processError) throw processError;
 
       console.log('File processed successfully');
       toast({
