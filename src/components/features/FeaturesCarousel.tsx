@@ -59,7 +59,7 @@ const FeaturesCarousel = () => {
   const duplicatedFeatures = [...features, ...features];
 
   return (
-    <div className="w-full py-12 bg-secondary/50">
+    <div className="w-full bg-secondary/50">
       <div className="container">
         <Carousel
           opts={{
