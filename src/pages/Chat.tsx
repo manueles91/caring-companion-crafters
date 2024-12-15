@@ -18,7 +18,7 @@ const Chat = () => {
     handleSend,
     showGuestPrompt,
     setShowGuestPrompt,
-    handleContinueAsGuest
+    handleGuestContinue
   } = useChat(agentId);
 
   if (!agent) {
@@ -44,7 +44,7 @@ const Chat = () => {
       <GuestPromptDialog
         open={showGuestPrompt}
         onClose={() => setShowGuestPrompt(false)}
-        onContinue={handleContinueAsGuest}
+        onContinue={handleGuestContinue}
       />
     </div>
   );
