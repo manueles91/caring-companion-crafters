@@ -65,15 +65,31 @@ serve(async (req) => {
       const pages = pdfDoc.getPages();
       let content = '';
 
-      // Simple text extraction approach
+      // Enhanced text extraction approach
       for (let i = 0; i < pages.length; i++) {
         const page = pages[i];
         content += `Page ${i + 1}\n`;
         
-        // Basic text extraction - this is a limitation of pdf-lib
-        // For better text extraction, consider using a different PDF library
-        const text = page.getTextContent?.() || '';
-        content += text + '\n\n';
+        // Access the internal PDFPage object to extract text content
+        const pageDict = (page as any).node;
+        const pageContent = pageDict.Contents();
+        
+        if (pageContent) {
+          // Convert PDF content stream to text
+          const textContent = pageContent.toString();
+          // Clean up common PDF operators and extract text between parentheses
+          const extractedText = textContent
+            .replace(/\\n/g, '\n')
+            .replace(/\\r/g, '')
+            .replace(/\\t/g, ' ')
+            .replace(/\\\(/g, '(')
+            .replace(/\\\)/g, ')')
+            .match(/\((.*?)\)/g)
+            ?.map(match => match.slice(1, -1))
+            .join(' ') || '';
+            
+          content += extractedText + '\n\n';
+        }
       }
 
       console.log('Extracted content length:', content.length);
