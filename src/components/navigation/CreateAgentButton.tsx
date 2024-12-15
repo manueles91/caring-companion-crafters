@@ -30,7 +30,9 @@ export const CreateAgentButton = ({ session, showCreateForm }: CreateAgentButton
     navigate("/?create=true");
   };
 
-  if (showCreateForm) return null;
+  // Hide button when in create form or edit form
+  const isEditingAgent = new URLSearchParams(window.location.search).get('edit');
+  if (showCreateForm || isEditingAgent) return null;
 
   return (
     <Button 
