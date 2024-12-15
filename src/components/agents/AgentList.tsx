@@ -1,12 +1,12 @@
 import React from "react";
 import { Skeleton } from "@/components/ui/skeleton";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import NoAgentsView from "./views/NoAgentsView";
 import CarouselView from "./views/CarouselView";
 import GridView from "./views/GridView";
 import { Agent } from "@/types/agent";
-import { useAuthStore } from "@/stores/authStore";
+import { useEffect } from "react";
 
 interface AgentListProps {
   userRole: 'user' | 'creator' | null;
@@ -14,7 +14,27 @@ interface AgentListProps {
 }
 
 const AgentList = ({ userRole, onCreateAgent }: AgentListProps) => {
-  const { session } = useAuthStore();
+  const queryClient = useQueryClient();
+
+  const { data: session } = useQuery({
+    queryKey: ['session'],
+    queryFn: async () => {
+      const { data: { session } } = await supabase.auth.getSession();
+      return session;
+    },
+  });
+
+  // Listen for auth changes and invalidate queries
+  useEffect(() => {
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      queryClient.invalidateQueries({ queryKey: ['session'] });
+      queryClient.invalidateQueries({ queryKey: ['agents'] });
+    });
+
+    return () => {
+      subscription.unsubscribe();
+    };
+  }, [queryClient]);
 
   const { data: agents, isLoading } = useQuery({
     queryKey: ['agents'],
