@@ -6,6 +6,13 @@ import AgentCard from "@/components/AgentCard";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
+import {
+  Carousel,
+  CarouselContent,
+  CarouselItem,
+  CarouselNext,
+  CarouselPrevious,
+} from "@/components/ui/carousel";
 
 interface AgentListProps {
   userRole: 'user' | 'creator' | null;
@@ -59,6 +66,32 @@ const AgentList = ({ userRole, onCreateAgent }: AgentListProps) => {
     );
   }
 
+  // Show carousel for signed out users
+  if (!userRole) {
+    return (
+      <div className="container mx-auto px-2">
+        <Carousel className="w-full max-w-xs mx-auto sm:max-w-sm md:max-w-md">
+          <CarouselContent>
+            {agents.map((agent) => (
+              <CarouselItem key={agent.id}>
+                <AgentCard
+                  id={agent.id}
+                  name={agent.name}
+                  expertise={agent.expertise}
+                  traits={agent.traits || []}
+                  onSelect={() => console.log("Selected agent:", agent.name)}
+                />
+              </CarouselItem>
+            ))}
+          </CarouselContent>
+          <CarouselPrevious />
+          <CarouselNext />
+        </Carousel>
+      </div>
+    );
+  }
+
+  // Show grid for signed in users
   return (
     <div className="container mx-auto px-2">
       <div className="grid grid-cols-3 gap-3">
