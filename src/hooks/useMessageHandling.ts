@@ -32,7 +32,14 @@ export const useMessageHandling = () => {
         await messageService.storeMessage(userMessage, agent);
       }
 
-      const assistantContent = await messageService.sendMessageToAgent([...messages, userMessage], agent);
+      const assistantContent = await messageService.sendMessageToAgent([...messages, userMessage], {
+        id: agent.id,
+        name: agent.name,
+        description: agent.description,
+        instructions: agent.instructions,
+        traits: agent.traits,
+      });
+      
       const assistantMessage: Message = { 
         role: "assistant", 
         content: assistantContent 
