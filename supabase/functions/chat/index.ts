@@ -20,6 +20,13 @@ serve(async (req) => {
     }
 
     const { messages, agent } = await req.json();
+    
+    // Validate agent and agent.id
+    if (!agent || !agent.id) {
+      console.error('Invalid agent data received:', agent);
+      throw new Error('Invalid agent data: missing agent ID');
+    }
+    
     console.log('Processing chat request for agent:', agent.name);
 
     const supabase = createClient(
