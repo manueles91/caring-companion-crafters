@@ -5,20 +5,18 @@ import { useEffect, useState } from "react";
 export const ThemeToggle = () => {
   const [mounted, setMounted] = useState(false);
   const [theme, setTheme] = useState<"light" | "dark">(() => {
-    if (typeof window !== "undefined") {
-      const stored = localStorage.getItem("theme");
-      if (stored === "dark" || stored === "light") return stored;
-      
-      if (window.matchMedia("(prefers-color-scheme: dark)").matches) {
-        return "dark";
-      }
-    }
-    return "light";
+    // Only access localStorage after component mounts
+    if (typeof window === "undefined") return "light";
+    return document.documentElement.classList.contains("dark") ? "dark" : "light";
   });
 
-  // Only run after mount to avoid hydration mismatch
   useEffect(() => {
     setMounted(true);
+  }, []);
+
+  useEffect(() => {
+    if (!mounted) return;
+
     const root = document.documentElement;
     if (theme === "dark") {
       root.classList.add("dark");
@@ -26,7 +24,7 @@ export const ThemeToggle = () => {
       root.classList.remove("dark");
     }
     localStorage.setItem("theme", theme);
-  }, [theme]);
+  }, [theme, mounted]);
 
   if (!mounted) {
     return null;
