@@ -28,7 +28,7 @@ const FileUpload = ({ agentId, onUploadComplete }: FileUploadProps) => {
       const fileExt = file.name.split('.').pop();
       const filePath = `${agentId}/${crypto.randomUUID()}.${fileExt}`;
 
-      const { error: uploadError } = await supabase.storage
+      const { error: uploadError, data: uploadData } = await supabase.storage
         .from('agent-files')
         .upload(filePath, file, {
           contentType: file.type,
@@ -39,7 +39,7 @@ const FileUpload = ({ agentId, onUploadComplete }: FileUploadProps) => {
 
       console.log('File uploaded to storage, processing file...');
 
-      // Now call the edge function to process the file
+      // Now call the edge function with the file metadata
       const { error: processError } = await supabase.functions.invoke('process-files', {
         body: {
           filename: file.name,
@@ -47,6 +47,9 @@ const FileUpload = ({ agentId, onUploadComplete }: FileUploadProps) => {
           contentType: file.type,
           size: file.size,
           agentId
+        },
+        headers: {
+          'Content-Type': 'application/json',
         }
       });
 
@@ -63,6 +66,18 @@ const FileUpload = ({ agentId, onUploadComplete }: FileUploadProps) => {
       }
     } catch (error) {
       console.error('Error uploading file:', error);
+      
+      // If there's an error, try to delete the uploaded file
+      if (file) {
+        try {
+          await supabase.storage
+            .from('agent-files')
+            .remove([`${agentId}/${file.name}`]);
+        } catch (deleteError) {
+          console.error('Error cleaning up file after failed upload:', deleteError);
+        }
+      }
+
       toast({
         title: "Error",
         description: "No se pudo subir el archivo",
