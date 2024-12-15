@@ -19,6 +19,11 @@ interface GuestPromptDialogProps {
 const GuestPromptDialog = ({ open, onClose, onContinue }: GuestPromptDialogProps) => {
   const navigate = useNavigate();
 
+  const handleContinueAsGuest = () => {
+    onClose();
+    onContinue();
+  };
+
   return (
     <Dialog open={open} onOpenChange={onClose}>
       <DialogContent>
@@ -31,7 +36,7 @@ const GuestPromptDialog = ({ open, onClose, onContinue }: GuestPromptDialogProps
         <DialogFooter className="flex-col gap-2 sm:flex-row sm:justify-end">
           <Button
             variant="outline"
-            onClick={onContinue}
+            onClick={handleContinueAsGuest}
           >
             Continue as Guest
           </Button>

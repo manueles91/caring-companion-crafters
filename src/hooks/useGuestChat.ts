@@ -43,9 +43,13 @@ export const useGuestChat = (agent: Agent | null) => {
     return canProceed;
   };
 
-  const handleContinueAsGuest = () => {
+  const handleContinueAsGuest = async () => {
     setShowGuestPrompt(false);
-    return true;
+    if (!agent) return false;
+    
+    // Update the interaction count and check if we can proceed
+    const canProceed = await updateGuestInteraction(agent);
+    return canProceed;
   };
 
   return {

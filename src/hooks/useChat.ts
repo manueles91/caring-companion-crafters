@@ -92,6 +92,13 @@ export const useChat = (agentId: string | null) => {
     await sendMessage(agent);
   };
 
+  const handleGuestContinue = async () => {
+    const canProceed = await handleContinueAsGuest();
+    if (canProceed) {
+      await sendMessage(agent);
+    }
+  };
+
   return {
     agent,
     messages,
@@ -101,6 +108,6 @@ export const useChat = (agentId: string | null) => {
     handleSend,
     showGuestPrompt,
     setShowGuestPrompt,
-    handleContinueAsGuest
+    handleGuestContinue
   };
 };
