@@ -65,17 +65,19 @@ serve(async (req) => {
       const pages = pdfDoc.getPages();
       let content = '';
 
-      // Correctly extract text from each page
+      // Extract text using a simpler approach
       for (const page of pages) {
-        // Get text operations from the page
-        const textOperations = await page.getTextContent();
-        if (textOperations && textOperations.items) {
-          // Combine all text items
-          const pageText = textOperations.items
-            .map(item => item.str)
-            .join(' ');
-          content += pageText + '\n';
+        const { width, height } = page.getSize();
+        content += `Page ${pages.indexOf(page) + 1}\n`;
+        
+        // Get all text operations on the page
+        const textObjects = await page.doc.getOperatorList();
+        for (const op of textObjects.fnArray) {
+          if (op === 'showText') {
+            content += textObjects.argsArray[textObjects.fnArray.indexOf(op)][0] + ' ';
+          }
         }
+        content += '\n\n';
       }
 
       console.log('Extracted content length:', content.length);
