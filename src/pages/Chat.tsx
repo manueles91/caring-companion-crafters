@@ -3,12 +3,23 @@ import { Card } from "@/components/ui/card";
 import ChatHeader from "@/components/chat/ChatHeader";
 import ChatMessages from "@/components/chat/ChatMessages";
 import ChatInput from "@/components/chat/ChatInput";
+import GuestPromptDialog from "@/components/chat/GuestPromptDialog";
 import { useChat } from "@/hooks/useChat";
 
 const Chat = () => {
   const [searchParams] = useSearchParams();
   const agentId = searchParams.get("agent");
-  const { agent, messages, input, setInput, isLoading, handleSend } = useChat(agentId);
+  const { 
+    agent, 
+    messages, 
+    input, 
+    setInput, 
+    isLoading, 
+    handleSend,
+    showGuestPrompt,
+    setShowGuestPrompt,
+    handleContinueAsGuest
+  } = useChat(agentId);
 
   if (!agent) {
     return (
@@ -30,6 +41,11 @@ const Chat = () => {
           isLoading={isLoading}
         />
       </Card>
+      <GuestPromptDialog
+        open={showGuestPrompt}
+        onClose={() => setShowGuestPrompt(false)}
+        onContinue={handleContinueAsGuest}
+      />
     </div>
   );
 };

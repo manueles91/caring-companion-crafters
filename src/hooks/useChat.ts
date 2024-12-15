@@ -13,6 +13,7 @@ export const useChat = (agentId: string | null) => {
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [showGuestPrompt, setShowGuestPrompt] = useState(false);
   const { toast } = useToast();
   const { checkGuestAccess, updateGuestInteraction } = useGuestInteractions();
 
@@ -83,6 +84,22 @@ export const useChat = (agentId: string | null) => {
 
     const { data: { session } } = await supabase.auth.getSession();
     if (!session) {
+      // Check if this is the second interaction
+      const guestId = localStorage.getItem('guestId');
+      if (guestId) {
+        const { data: interactions } = await supabase
+          .from('guest_interactions')
+          .select('interaction_count')
+          .eq('guest_id', guestId)
+          .eq('agent_id', agent.id)
+          .single();
+
+        if (interactions?.interaction_count === 1) {
+          setShowGuestPrompt(true);
+          return;
+        }
+      }
+
       const canProceed = await updateGuestInteraction(agent);
       if (!canProceed) return;
     }
@@ -120,12 +137,20 @@ export const useChat = (agentId: string | null) => {
     }
   };
 
+  const handleContinueAsGuest = () => {
+    setShowGuestPrompt(false);
+    handleSend();
+  };
+
   return {
     agent,
     messages,
     input,
     setInput,
     isLoading,
-    handleSend
+    handleSend,
+    showGuestPrompt,
+    setShowGuestPrompt,
+    handleContinueAsGuest
   };
 };
