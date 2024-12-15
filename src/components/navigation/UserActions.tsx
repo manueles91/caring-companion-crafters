@@ -18,17 +18,35 @@ export const UserActions = ({ session, onAction }: UserActionsProps) => {
 
   const handleSignOut = async () => {
     try {
-      await supabase.auth.signOut();
+      const { error } = await supabase.auth.signOut();
+      
+      if (error) {
+        if (error.message.includes('session_not_found')) {
+          // If session is invalid, clear local storage and refresh
+          localStorage.clear();
+          window.location.reload();
+        } else {
+          throw error;
+        }
+      }
+
       toast({
         title: "Signed out successfully",
       });
+      
       navigate("/");
       onAction();
-    } catch (error) {
+    } catch (error: any) {
+      console.error('Sign out error:', error);
       toast({
         title: "Error signing out",
+        description: "Please try refreshing the page",
         variant: "destructive",
       });
+      
+      // Force clear session and refresh as fallback
+      localStorage.clear();
+      window.location.reload();
     }
   };
 
