@@ -5,7 +5,6 @@ import { useToast } from "./ui/use-toast";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useQuery } from "@tanstack/react-query";
-import { ArrowLeft } from "lucide-react";
 import { validateAgentForm } from "@/utils/agentFormValidation";
 import { createAgent, updateAgent } from "@/utils/agentFormSubmission";
 import AgentFormFields from "./agents/AgentFormFields";
@@ -111,20 +110,9 @@ const CreateAgentForm = ({ agentId }: CreateAgentFormProps) => {
 
   return (
     <Card className="p-6 max-w-2xl mx-auto animate-fade-in">
-      <div className="flex items-center gap-4 mb-6">
-        <Button
-          variant="ghost"
-          size="icon"
-          onClick={() => navigate('/')}
-          className="hover:bg-accent"
-        >
-          <ArrowLeft className="h-5 w-5" />
-          <span className="sr-only">Volver</span>
-        </Button>
-        <h2 className="text-2xl font-semibold">
-          {agentId ? "Editar Agente IA" : "Crear Nuevo Agente IA"}
-        </h2>
-      </div>
+      <h2 className="text-2xl font-semibold mb-6">
+        {agentId ? "Editar Agente IA" : "Crear Nuevo Agente IA"}
+      </h2>
       
       <form onSubmit={handleSubmit} className="space-y-6">
         <AgentFormFields
