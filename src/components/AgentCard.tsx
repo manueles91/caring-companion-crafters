@@ -11,11 +11,12 @@ import AgentActions from "./agent/AgentActions";
 interface AgentCardProps {
   id: string;
   name: string;
+  expertise: string;
   traits: string[];
   onSelect: () => void;
 }
 
-const AgentCard = ({ id, name, traits, onSelect }: AgentCardProps) => {
+const AgentCard = ({ id, name, expertise, traits, onSelect }: AgentCardProps) => {
   const navigate = useNavigate();
 
   const { data: session } = useQuery({
@@ -25,8 +26,6 @@ const AgentCard = ({ id, name, traits, onSelect }: AgentCardProps) => {
       return session;
     },
   });
-
-  const expertise = traits[0] || "General Assistant";
 
   return (
     <Card 

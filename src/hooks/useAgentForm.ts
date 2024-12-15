@@ -35,10 +35,10 @@ export const useAgentForm = (agentId?: string | null) => {
   React.useEffect(() => {
     if (agentData) {
       setName(agentData.name || '');
-      setExpertise(agentData.traits?.[0] || '');
+      setExpertise(agentData.expertise || '');
       setDescription(agentData.description || '');
       setInstructions(agentData.instructions || '');
-      setSelectedTraits(agentData.traits?.slice(1) || []);
+      setSelectedTraits(agentData.traits || []);
     }
   }, [agentData]);
 
@@ -73,7 +73,8 @@ export const useAgentForm = (agentId?: string | null) => {
         name,
         description,
         instructions: instructions || null,
-        traits: [expertise, ...selectedTraits],
+        expertise,
+        traits: selectedTraits,
       };
 
       if (agentId) {

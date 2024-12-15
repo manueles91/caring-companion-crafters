@@ -14,6 +14,7 @@ export type Database = {
           created_at: string | null
           creator_id: string | null
           description: string
+          expertise: string
           id: string
           instructions: string | null
           name: string
@@ -24,6 +25,7 @@ export type Database = {
           created_at?: string | null
           creator_id?: string | null
           description: string
+          expertise: string
           id?: string
           instructions?: string | null
           name: string
@@ -34,6 +36,7 @@ export type Database = {
           created_at?: string | null
           creator_id?: string | null
           description?: string
+          expertise?: string
           id?: string
           instructions?: string | null
           name?: string
