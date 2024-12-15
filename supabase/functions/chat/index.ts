@@ -28,15 +28,49 @@ serve(async (req) => {
     );
 
     // Fetch agent's files
-    const { data: files } = await supabase
+    const { data: files, error: filesError } = await supabase
       .from('agent_files')
       .select('*')
       .eq('agent_id', agent.id);
 
+    if (filesError) {
+      console.error('Error fetching files:', filesError);
+      throw filesError;
+    }
+
+    // Build context from files
     let filesContext = '';
     if (files && files.length > 0) {
-      filesContext = `\nThis agent has access to the following files for reference:
-${files.map(file => `- ${file.filename}`).join('\n')}`;
+      console.log('Found files for agent:', files.length);
+      
+      for (const file of files) {
+        try {
+          // Download file content from storage
+          const { data: fileData, error: downloadError } = await supabase
+            .storage
+            .from('agent-files')
+            .download(file.file_path);
+
+          if (downloadError) {
+            console.error('Error downloading file:', downloadError);
+            continue;
+          }
+
+          // Convert file content to text
+          let fileContent = '';
+          if (file.content_type === 'application/pdf') {
+            // For PDFs, we'll need to extract text - for now just mention it
+            fileContent = `[Content from PDF file: ${file.filename}]`;
+          } else {
+            // For text files, read the content
+            fileContent = await fileData.text();
+          }
+
+          filesContext += `\nContent from ${file.filename}:\n${fileContent}\n`;
+        } catch (error) {
+          console.error('Error processing file:', file.filename, error);
+        }
+      }
     }
 
     const systemMessage = {
@@ -48,10 +82,15 @@ Description: ${agent.description}
 ${agent.traits?.length ? `Personality traits: ${agent.traits.join(', ')}` : ''}
 
 ${agent.instructions ? `Special instructions: ${agent.instructions}` : ''}
-${filesContext}
 
+Knowledge Base:
+${filesContext || 'No additional files provided.'}
+
+Use this knowledge to inform your responses. When answering questions, refer to specific information from the files when relevant.
 Maintain these characteristics throughout the conversation and respond in Spanish.`
     };
+
+    console.log('System message prepared with file context');
 
     const openAIRequest = {
       model: 'gpt-3.5-turbo',
@@ -60,7 +99,7 @@ Maintain these characteristics throughout the conversation and respond in Spanis
       max_tokens: 500
     };
 
-    console.log('Sending request to OpenAI:', JSON.stringify(openAIRequest));
+    console.log('Sending request to OpenAI');
 
     const response = await fetch('https://api.openai.com/v1/chat/completions', {
       method: 'POST',
@@ -90,7 +129,7 @@ Maintain these characteristics throughout the conversation and respond in Spanis
     }
 
     const data = await response.json();
-    console.log('OpenAI API response:', JSON.stringify(data));
+    console.log('Received response from OpenAI');
 
     if (!data.choices?.[0]?.message?.content) {
       console.error('Unexpected API response format:', data);
