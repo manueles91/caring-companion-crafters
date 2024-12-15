@@ -21,7 +21,10 @@ export const updateAgent = async (agentId: string, formData: AgentFormData) => {
     })
     .eq('id', agentId);
 
-  if (error) throw error;
+  if (error) {
+    console.error('Error updating agent:', error);
+    throw error;
+  }
   return true;
 };
 
@@ -39,6 +42,9 @@ export const createAgent = async (formData: AgentFormData, userId: string) => {
     .select()
     .single();
 
-  if (error) throw error;
+  if (error) {
+    console.error('Error creating agent:', error);
+    throw error;
+  }
   return agent;
 };
