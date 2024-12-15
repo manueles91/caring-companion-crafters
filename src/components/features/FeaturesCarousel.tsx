@@ -55,7 +55,6 @@ const FeaturesCarousel = () => {
     },
   ];
 
-  // Duplicate features array to create a seamless loop effect
   const duplicatedFeatures = [...features, ...features];
 
   return (
@@ -83,7 +82,7 @@ const FeaturesCarousel = () => {
                 className="pl-2 md:pl-4 md:basis-1/3 lg:basis-1/4"
               >
                 <div className="p-4">
-                  <div className="flex flex-col items-center text-center space-y-4 p-6 bg-background dark:bg-[#1A1F2C] rounded-xl shadow-sm hover:shadow-md transition-shadow dark:shadow-none">
+                  <div className="flex flex-col items-center text-center space-y-4 p-6 rounded-xl shadow-sm hover:shadow-md transition-shadow dark:shadow-none">
                     <div className="p-3 bg-primary/10 dark:bg-primary/20 rounded-full">
                       {feature.icon}
                     </div>
