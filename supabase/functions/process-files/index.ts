@@ -65,21 +65,34 @@ serve(async (req) => {
       const pages = pdfDoc.getPages();
       let content = '';
 
-      for (let i = 0; i < pages.length; i++) {
-        const page = pages[i];
-        const text = await page.doc.getText();
-        content += text + '\n';
+      // Correctly extract text from each page
+      for (const page of pages) {
+        // Get text operations from the page
+        const textOperations = await page.getTextContent();
+        if (textOperations && textOperations.items) {
+          // Combine all text items
+          const pageText = textOperations.items
+            .map(item => item.str)
+            .join(' ');
+          content += pageText + '\n';
+        }
       }
+
+      console.log('Extracted content length:', content.length);
 
       // Store extracted content
       const { error: contentError } = await supabase
         .from('file_contents')
         .insert({
           file_id: fileRecord.id,
-          content: content
+          content: content || 'No text content could be extracted'
         });
 
-      if (contentError) throw contentError;
+      if (contentError) {
+        console.error('Error storing content:', contentError);
+        throw contentError;
+      }
+      
       console.log('PDF content extracted and stored successfully');
     }
 
