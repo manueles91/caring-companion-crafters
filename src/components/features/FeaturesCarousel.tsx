@@ -24,34 +24,34 @@ const FeaturesCarousel = () => {
   
   const features: Feature[] = [
     {
-      id: "create-agents",
-      title: t("features.createAgents.title"),
-      description: t("features.createAgents.description"),
-      icon: <UserPlus className="w-6 h-6" />,
-    },
-    {
       id: "knowledge-base",
-      title: t("features.knowledgeBase.title"),
-      description: t("features.knowledgeBase.description"),
+      title: "Knowledge Base",
+      description: "Upload files and images to enhance your assistant's knowledge and capabilities",
       icon: <BookOpen className="w-6 h-6" />,
     },
     {
       id: "long-memory",
-      title: t("features.longMemory.title"),
-      description: t("features.longMemory.description"),
+      title: "Continuous Learning",
+      description: "Your assistant remembers and learns from every conversation to provide better responses",
       icon: <Brain className="w-6 h-6" />,
     },
     {
-      id: "reports",
-      title: t("features.reports.title"),
-      description: t("features.reports.description"),
-      icon: <ChartBar className="w-6 h-6" />,
+      id: "customization",
+      title: "Custom Actions",
+      description: "Define specific actions and capabilities for your assistant to perform",
+      icon: <Rocket className="w-6 h-6" />,
     },
     {
-      id: "customization",
-      title: t("features.customization.title"),
-      description: t("features.customization.description"),
-      icon: <Rocket className="w-6 h-6" />,
+      id: "personality",
+      title: "Personality Traits",
+      description: "Shape your assistant's behavior and communication style to match your preferences",
+      icon: <UserPlus className="w-6 h-6" />,
+    },
+    {
+      id: "analytics",
+      title: "Performance Insights",
+      description: "Track and analyze your assistant's interactions and effectiveness",
+      icon: <ChartBar className="w-6 h-6" />,
     },
   ];
 
