@@ -1,20 +1,7 @@
 import React from "react";
-import { Edit, Trash2 } from "lucide-react";
+import { Edit } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
-import { supabase } from "@/integrations/supabase/client";
-import { useToast } from "@/components/ui/use-toast";
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-  AlertDialogTrigger,
-} from "@/components/ui/alert-dialog";
 
 interface AgentActionsProps {
   id: string;
@@ -24,7 +11,6 @@ interface AgentActionsProps {
 
 const AgentActions = ({ id, name, session }: AgentActionsProps) => {
   const navigate = useNavigate();
-  const { toast } = useToast();
 
   const handleEdit = (e: React.MouseEvent) => {
     e.stopPropagation();
@@ -36,72 +22,14 @@ const AgentActions = ({ id, name, session }: AgentActionsProps) => {
     navigate(`/chat?agent=${id}`);
   };
 
-  const handleDelete = async () => {
-    try {
-      const { error } = await supabase
-        .from('agents')
-        .delete()
-        .eq('id', id);
-
-      if (error) throw error;
-
-      toast({
-        title: "Agente eliminado",
-        description: "El agente ha sido eliminado exitosamente",
-      });
-
-      // Redirect to home page after deletion
-      navigate('/');
-      window.location.reload();
-    } catch (error) {
-      console.error('Error deleting agent:', error);
-      toast({
-        title: "Error",
-        description: "No se pudo eliminar el agente",
-        variant: "destructive",
-      });
-    }
-  };
-
   if (session) {
     return (
-      <div className="flex gap-2">
-        <button
-          onClick={handleEdit}
-          className="p-1.5 rounded-full bg-accent hover:bg-accent/80 transition-colors"
-        >
-          <Edit className="h-4 w-4" />
-        </button>
-        <AlertDialog>
-          <AlertDialogTrigger asChild onClick={(e) => e.stopPropagation()}>
-            <button className="p-1.5 rounded-full bg-red-100 hover:bg-red-200 transition-colors">
-              <Trash2 className="h-4 w-4 text-red-500" />
-            </button>
-          </AlertDialogTrigger>
-          <AlertDialogContent>
-            <AlertDialogHeader>
-              <AlertDialogTitle>¿Estás seguro?</AlertDialogTitle>
-              <AlertDialogDescription>
-                Esta acción eliminará permanentemente el agente "{name}". Esta acción no se puede deshacer.
-              </AlertDialogDescription>
-            </AlertDialogHeader>
-            <AlertDialogFooter>
-              <AlertDialogCancel onClick={(e) => e.stopPropagation()}>
-                Cancelar
-              </AlertDialogCancel>
-              <AlertDialogAction 
-                onClick={(e) => {
-                  e.stopPropagation();
-                  handleDelete();
-                }}
-                className="bg-red-500 hover:bg-red-600"
-              >
-                Eliminar
-              </AlertDialogAction>
-            </AlertDialogFooter>
-          </AlertDialogContent>
-        </AlertDialog>
-      </div>
+      <button
+        onClick={handleEdit}
+        className="p-1.5 rounded-full bg-accent hover:bg-accent/80 transition-colors"
+      >
+        <Edit className="h-4 w-4" />
+      </button>
     );
   }
 
