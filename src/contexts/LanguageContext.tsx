@@ -35,6 +35,11 @@ const translations = {
     "auth.subtitle": "Create an account or sign in to continue",
     "auth.error.title": "Authentication Error",
     "auth.error.invalidCredentials": "Invalid email or password. Please try again.",
+    "auth.wantMore": "Want to do more?",
+    "auth.signUpTo": "Sign up to",
+    "auth.features.createAgents": "Create your own AI assistants with custom personalities",
+    "auth.features.addFiles": "Add files and custom instructions to enhance their knowledge",
+    "auth.features.enableMemory": "Enable long-term memory for continuous learning"
   },
   es: {
     "nav.title": "Mis Asistentes",
@@ -62,6 +67,11 @@ const translations = {
     "auth.subtitle": "Crea una cuenta o inicia sesión para continuar",
     "auth.error.title": "Error de Autenticación",
     "auth.error.invalidCredentials": "Email o contraseña inválidos. Por favor, intenta de nuevo.",
+    "auth.wantMore": "¿Quieres hacer más?",
+    "auth.signUpTo": "Regístrate para",
+    "auth.features.createAgents": "Crea tus propios asistentes IA con personalidades personalizadas",
+    "auth.features.addFiles": "Añade archivos e instrucciones personalizadas para mejorar su conocimiento",
+    "auth.features.enableMemory": "Habilita la memoria a largo plazo para un aprendizaje continuo"
   }
 };
 

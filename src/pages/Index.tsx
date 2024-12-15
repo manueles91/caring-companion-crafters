@@ -9,12 +9,14 @@ import AgentList from "@/components/agents/AgentList";
 import FeaturesCarousel from "@/components/features/FeaturesCarousel";
 import { v4 as uuidv4 } from 'uuid';
 import { useSearchParams } from 'react-router-dom';
+import { useLanguage } from "@/contexts/LanguageContext";
 
 const Index = () => {
   const [searchParams] = useSearchParams();
   const [session, setSession] = React.useState(null);
   const [userRole, setUserRole] = React.useState<'user' | 'creator' | null>(null);
   const { toast } = useToast();
+  const { t } = useLanguage();
 
   const showCreateForm = searchParams.get('create') === 'true';
   const editAgentId = searchParams.get('edit');
@@ -116,12 +118,12 @@ const Index = () => {
           <>
             <FeaturesCarousel />
             <div id="auth-section" className="mt-8 p-6 bg-muted dark:bg-[#1A1F2C] rounded-lg scroll-mt-24 max-w-lg mx-auto text-center">
-              <h2 className="text-xl font-semibold mb-4 dark:text-white">Want to do more?</h2>
-              <p className="mb-4 dark:text-gray-300">Sign up to:</p>
+              <h2 className="text-xl font-semibold mb-4 dark:text-white">{t("auth.wantMore")}</h2>
+              <p className="mb-4 dark:text-gray-300">{t("auth.signUpTo")}:</p>
               <ul className="list-disc list-inside mb-6 space-y-2 dark:text-gray-300">
-                <li>Create your own AI assistants with custom personalities</li>
-                <li>Add files and custom instructions to enhance their knowledge</li>
-                <li>Enable long-term memory for continuous learning</li>
+                <li>{t("auth.features.createAgents")}</li>
+                <li>{t("auth.features.addFiles")}</li>
+                <li>{t("auth.features.enableMemory")}</li>
               </ul>
               <AuthUI />
             </div>
