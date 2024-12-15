@@ -51,10 +51,10 @@ export const UserActions = ({ session, onAction }: UserActionsProps) => {
   };
 
   const scrollToAuth = () => {
-    const authSection = document.getElementById('auth-section');
-    if (authSection) {
-      authSection.scrollIntoView({ behavior: 'smooth' });
-    }
+    window.scrollTo({
+      top: document.documentElement.scrollHeight,
+      behavior: 'smooth'
+    });
     onAction();
   };
 
