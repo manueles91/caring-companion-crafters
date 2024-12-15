@@ -17,6 +17,7 @@ export const updateAgent = async (agentId: string, formData: AgentFormData) => {
       instructions: formData.instructions || null,
       expertise: formData.expertise,
       traits: formData.traits,
+      updated_at: new Date().toISOString(),
     })
     .eq('id', agentId);
 
