@@ -35,13 +35,18 @@ const CreateAgentForm = ({ agentId }: CreateAgentFormProps) => {
   const { toast } = useToast();
 
   const handleDelete = async () => {
+    if (!agentId) return;
+
     try {
       const { error } = await supabase
         .from('agents')
         .delete()
         .eq('id', agentId);
 
-      if (error) throw error;
+      if (error) {
+        console.error('Error deleting agent:', error);
+        throw error;
+      }
 
       toast({
         title: "Agente eliminado",
@@ -83,7 +88,7 @@ const CreateAgentForm = ({ agentId }: CreateAgentFormProps) => {
           isSubmitting={isSubmitting}
           isEditing={!!agentId}
           onCancel={() => navigate('/')}
-          onDelete={agentId ? handleDelete : undefined}
+          onDelete={handleDelete}
         />
       </form>
     </Card>
