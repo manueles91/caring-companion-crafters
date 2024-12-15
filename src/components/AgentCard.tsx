@@ -36,7 +36,7 @@ const AgentCard = ({ id, name, traits, onSelect }: AgentCardProps) => {
       <div className="flex flex-col items-center text-center space-y-2">
         <AgentAvatar name={name} />
         <h3 className="text-base font-semibold line-clamp-1">{name}</h3>
-        <Badge variant="secondary" className="text-xs px-2 py-0.5">
+        <Badge variant="secondary" className="text-[10px] px-2 py-0.5 whitespace-nowrap overflow-hidden text-ellipsis max-w-full">
           {expertise}
         </Badge>
       </div>
