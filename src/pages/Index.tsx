@@ -119,9 +119,9 @@ const Index = () => {
               <h2 className="text-xl font-semibold mb-4 dark:text-white">Want to do more?</h2>
               <p className="mb-4 dark:text-gray-300">Sign up to:</p>
               <ul className="list-disc list-inside mb-6 space-y-2 dark:text-gray-300">
-                <li>Continue conversations after 5 messages</li>
-                <li>Create your own agents</li>
-                <li>Save your chat history</li>
+                <li>Create your own AI assistants with custom personalities</li>
+                <li>Add files and custom instructions to enhance their knowledge</li>
+                <li>Enable long-term memory for continuous learning</li>
               </ul>
               <AuthUI />
             </div>
