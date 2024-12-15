@@ -15,9 +15,11 @@ serve(async (req) => {
   }
 
   try {
+    console.log('Processing file upload request');
     const { file, agentId } = await req.json();
     
     if (!file || !agentId) {
+      console.error('Missing required fields:', { file: !!file, agentId: !!agentId });
       throw new Error('Missing required fields');
     }
 
@@ -40,6 +42,8 @@ serve(async (req) => {
     const fileExt = file.name.split('.').pop();
     const filePath = `${agentId}/${crypto.randomUUID()}.${fileExt}`;
 
+    console.log('Uploading file to storage:', filePath);
+
     // Upload original file to storage
     const { data: uploadData, error: uploadError } = await supabase.storage
       .from('agent-files')
@@ -48,7 +52,12 @@ serve(async (req) => {
         upsert: false
       });
 
-    if (uploadError) throw uploadError;
+    if (uploadError) {
+      console.error('Error uploading to storage:', uploadError);
+      throw uploadError;
+    }
+
+    console.log('File uploaded successfully, creating database record');
 
     // Insert file record
     const { data: fileRecord, error: dbError } = await supabase
@@ -63,11 +72,14 @@ serve(async (req) => {
       .select()
       .single();
 
-    if (dbError) throw dbError;
+    if (dbError) {
+      console.error('Error inserting file record:', dbError);
+      throw dbError;
+    }
 
     // Extract content if PDF
     if (file.type === 'application/pdf') {
-      console.log('Extracting content from PDF using pdf-parse');
+      console.log('Extracting content from PDF');
       
       try {
         const dataBuffer = bytes.buffer;

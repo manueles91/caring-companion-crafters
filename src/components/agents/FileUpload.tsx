@@ -18,6 +18,7 @@ const FileUpload = ({ agentId, onUploadComplete }: FileUploadProps) => {
     if (!file || !agentId) return;
 
     setIsUploading(true);
+    console.log('Starting file upload process for:', file.name);
 
     try {
       const { data: { session } } = await supabase.auth.getSession();
@@ -32,6 +33,7 @@ const FileUpload = ({ agentId, onUploadComplete }: FileUploadProps) => {
       });
 
       const base64File = await filePromise;
+      console.log('File converted to base64, sending to Edge Function');
       
       const { error } = await supabase.functions.invoke('process-files', {
         body: {
@@ -47,6 +49,7 @@ const FileUpload = ({ agentId, onUploadComplete }: FileUploadProps) => {
 
       if (error) throw error;
 
+      console.log('File processed successfully');
       toast({
         title: "Archivo subido exitosamente",
         description: "El archivo se ha agregado al agente",
