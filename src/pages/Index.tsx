@@ -115,10 +115,10 @@ const Index = () => {
         {!session && (
           <>
             <FeaturesCarousel />
-            <div id="auth-section" className="mt-8 p-6 bg-muted rounded-lg scroll-mt-24">
-              <h2 className="text-xl font-semibold mb-4">Want to do more?</h2>
-              <p className="mb-4">Sign up to:</p>
-              <ul className="list-disc list-inside mb-6 space-y-2">
+            <div id="auth-section" className="mt-8 p-6 bg-muted dark:bg-[#1A1F2C] rounded-lg scroll-mt-24">
+              <h2 className="text-xl font-semibold mb-4 dark:text-white">Want to do more?</h2>
+              <p className="mb-4 dark:text-gray-300">Sign up to:</p>
+              <ul className="list-disc list-inside mb-6 space-y-2 dark:text-gray-300">
                 <li>Continue conversations after 5 messages</li>
                 <li>Create your own agents</li>
                 <li>Save your chat history</li>
