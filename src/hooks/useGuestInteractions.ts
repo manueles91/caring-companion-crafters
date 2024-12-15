@@ -7,13 +7,6 @@ export const useGuestInteractions = () => {
   const { toast } = useToast();
   const navigate = useNavigate();
 
-  const scrollToAuth = () => {
-    window.scrollTo({
-      top: document.documentElement.scrollHeight,
-      behavior: 'smooth'
-    });
-  };
-
   const checkGuestAccess = async (agentId: string | null) => {
     const guestId = localStorage.getItem('guestId');
     if (!guestId) {
@@ -39,7 +32,6 @@ export const useGuestInteractions = () => {
         description: "You've reached the maximum number of messages as a guest. Please sign up to continue.",
       });
       navigate("/");
-      scrollToAuth();
       return false;
     }
 
@@ -78,7 +70,6 @@ export const useGuestInteractions = () => {
           description: "You've reached the maximum number of messages as a guest. Please sign up to continue.",
         });
         navigate("/");
-        scrollToAuth();
         return false;
       }
     }
