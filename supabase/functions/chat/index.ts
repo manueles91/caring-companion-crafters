@@ -1,6 +1,5 @@
 import "https://deno.land/x/xhr@0.1.0/mod.ts";
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
-import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.7.1';
 
 const openAIApiKey = Deno.env.get('OPENAI_API_KEY');
 
@@ -10,6 +9,7 @@ const corsHeaders = {
 };
 
 serve(async (req) => {
+  // Handle CORS preflight requests
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
   }
@@ -20,68 +20,11 @@ serve(async (req) => {
     }
 
     const { messages, agent } = await req.json();
-    
-    if (!agent || !agent.id) {
-      console.error('Invalid agent data received:', agent);
-      throw new Error('Invalid agent data: missing agent ID');
-    }
-    
     console.log('Processing chat request for agent:', agent.name);
+    console.log('Agent configuration:', JSON.stringify(agent));
+    console.log('Messages:', JSON.stringify(messages));
 
-    const supabase = createClient(
-      Deno.env.get('SUPABASE_URL') ?? '',
-      Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
-    );
-
-    // Fetch agent's files and their contents
-    const { data: files, error: filesError } = await supabase
-      .from('agent_files')
-      .select(`
-        id,
-        filename,
-        content_type,
-        file_contents (
-          content
-        )
-      `)
-      .eq('agent_id', agent.id);
-
-    if (filesError) {
-      console.error('Error fetching files:', filesError);
-      throw filesError;
-    }
-
-    // Build context from files
-    let filesContext = '';
-    if (files && files.length > 0) {
-      console.log('Found files for agent:', files.length);
-      
-      for (const file of files) {
-        const fileContent = file.file_contents?.[0]?.content;
-        if (fileContent) {
-          filesContext += `\nContent from ${file.filename}:\n${fileContent}\n`;
-        } else if (file.content_type !== 'application/pdf') {
-          try {
-            // Download non-PDF file content from storage
-            const { data: fileData, error: downloadError } = await supabase
-              .storage
-              .from('agent-files')
-              .download(file.file_path);
-
-            if (downloadError) {
-              console.error('Error downloading file:', downloadError);
-              continue;
-            }
-
-            const textContent = await fileData.text();
-            filesContext += `\nContent from ${file.filename}:\n${textContent}\n`;
-          } catch (error) {
-            console.error('Error processing file:', file.filename, error);
-          }
-        }
-      }
-    }
-
+    // Create a detailed system message based on agent configuration
     const systemMessage = {
       role: 'system',
       content: `You are ${agent.name}, an AI assistant with the following characteristics:
@@ -92,14 +35,8 @@ ${agent.traits?.length ? `Personality traits: ${agent.traits.join(', ')}` : ''}
 
 ${agent.instructions ? `Special instructions: ${agent.instructions}` : ''}
 
-Knowledge Base:
-${filesContext || 'No additional files provided.'}
-
-Use this knowledge to inform your responses. When answering questions, refer to specific information from the files when relevant.
 Maintain these characteristics throughout the conversation and respond in Spanish.`
     };
-
-    console.log('System message prepared with file context');
 
     const openAIRequest = {
       model: 'gpt-3.5-turbo',
@@ -108,7 +45,7 @@ Maintain these characteristics throughout the conversation and respond in Spanis
       max_tokens: 500
     };
 
-    console.log('Sending request to OpenAI');
+    console.log('Sending request to OpenAI:', JSON.stringify(openAIRequest));
 
     const response = await fetch('https://api.openai.com/v1/chat/completions', {
       method: 'POST',
@@ -138,7 +75,7 @@ Maintain these characteristics throughout the conversation and respond in Spanis
     }
 
     const data = await response.json();
-    console.log('Received response from OpenAI');
+    console.log('OpenAI API response:', JSON.stringify(data));
 
     if (!data.choices?.[0]?.message?.content) {
       console.error('Unexpected API response format:', data);

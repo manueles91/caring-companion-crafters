@@ -2,7 +2,6 @@ import React from "react";
 import { Input } from "../ui/input";
 import { Textarea } from "../ui/textarea";
 import PersonalityTraits from "./PersonalityTraits";
-import FileUpload from "./FileUpload";
 
 interface AgentFormFieldsProps {
   name: string;
@@ -15,7 +14,6 @@ interface AgentFormFieldsProps {
   setInstructions: (value: string) => void;
   selectedTraits: string[];
   onToggleTrait: (trait: string) => void;
-  agentId?: string | null;
 }
 
 const AgentFormFields = ({
@@ -29,7 +27,6 @@ const AgentFormFields = ({
   setInstructions,
   selectedTraits,
   onToggleTrait,
-  agentId
 }: AgentFormFieldsProps) => {
   return (
     <div className="space-y-6">
@@ -80,16 +77,6 @@ const AgentFormFields = ({
           onChange={(e) => setInstructions(e.target.value)}
         />
       </div>
-
-      {agentId && (
-        <div>
-          <label className="text-sm font-medium mb-2 block">Archivos de Conocimiento</label>
-          <p className="text-sm text-muted-foreground mb-2">
-            Sube archivos para que el agente pueda utilizarlos como base de conocimiento
-          </p>
-          <FileUpload agentId={agentId} />
-        </div>
-      )}
     </div>
   );
 };

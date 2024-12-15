@@ -96,7 +96,6 @@ const CreateAgentForm = ({ agentId }: CreateAgentFormProps) => {
           setInstructions={setInstructions}
           selectedTraits={selectedTraits}
           onToggleTrait={toggleTrait}
-          agentId={agentId}
         />
 
         <AgentFormActions
