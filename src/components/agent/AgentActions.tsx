@@ -26,7 +26,7 @@ const AgentActions = ({ id, name, session }: AgentActionsProps) => {
     return (
       <button
         onClick={handleEdit}
-        className="p-1.5 rounded-full bg-accent hover:bg-accent/80 transition-colors"
+        className="p-1.5 rounded-full bg-accent hover:bg-accent/80 transition-colors dark:bg-[#333333] dark:hover:bg-[#555555] dark:text-white"
       >
         <Edit className="h-4 w-4" />
       </button>
