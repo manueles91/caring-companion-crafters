@@ -32,8 +32,7 @@ export const useGuestChat = (agent: Agent | null) => {
         .eq('agent_id', agent.id)
         .maybeSingle();
 
-      // Show prompt when interaction_count is 0 (before second interaction)
-      if (!interactions || interactions.interaction_count === 0) {
+      if (interactions?.interaction_count === 1) {
         setShowGuestPrompt(true);
         return false;
       }
