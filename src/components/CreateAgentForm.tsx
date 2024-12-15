@@ -29,8 +29,8 @@ const CreateAgentForm = ({ agentId }: CreateAgentFormProps) => {
   } = formActions;
 
   return (
-    <Card className="p-6 max-w-2xl mx-auto animate-fade-in">
-      <h2 className="text-2xl font-semibold mb-6">
+    <Card className="p-6 max-w-2xl mx-auto animate-fade-in text-center">
+      <h2 className="text-2xl font-semibold mb-6 text-center">
         {agentId ? "Editar Agente IA" : "Crear Nuevo Agente IA"}
       </h2>
       
