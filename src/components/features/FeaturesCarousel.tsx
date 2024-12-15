@@ -59,7 +59,7 @@ const FeaturesCarousel = () => {
   const duplicatedFeatures = [...features, ...features];
 
   return (
-    <div className="w-full bg-secondary/50">
+    <div className="w-full bg-secondary/50 dark:bg-secondary/10">
       <div className="container">
         <Carousel
           opts={{
@@ -83,12 +83,14 @@ const FeaturesCarousel = () => {
                 className="pl-2 md:pl-4 md:basis-1/3 lg:basis-1/4"
               >
                 <div className="p-4">
-                  <div className="flex flex-col items-center text-center space-y-4 p-6 bg-white rounded-xl shadow-sm hover:shadow-md transition-shadow">
-                    <div className="p-3 bg-primary/10 rounded-full">
+                  <div className="flex flex-col items-center text-center space-y-4 p-6 bg-background dark:bg-[#1A1F2C] rounded-xl shadow-sm hover:shadow-md transition-shadow dark:shadow-none">
+                    <div className="p-3 bg-primary/10 dark:bg-primary/20 rounded-full">
                       {feature.icon}
                     </div>
-                    <h3 className="text-lg font-semibold">{feature.title}</h3>
-                    <p className="text-muted-foreground text-sm">
+                    <h3 className="text-lg font-semibold dark:text-white">
+                      {feature.title}
+                    </h3>
+                    <p className="text-muted-foreground dark:text-gray-300">
                       {feature.description}
                     </p>
                   </div>
