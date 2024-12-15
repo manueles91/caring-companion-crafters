@@ -1,6 +1,7 @@
 import "https://deno.land/x/xhr@0.1.0/mod.ts";
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.7.1';
+import { PDFDocument } from 'https://cdn.skypack.dev/pdf-lib';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -60,12 +61,30 @@ serve(async (req) => {
     if (file.type === 'application/pdf') {
       console.log('Extracting content from PDF using OpenAI');
       
-      // Get the public URL of the uploaded file
+      // Convert PDF to PNG
+      const arrayBuffer = await file.arrayBuffer();
+      const pdfDoc = await PDFDocument.load(arrayBuffer);
+      const pages = pdfDoc.getPages();
+      const firstPage = pages[0];
+      const pngImage = await firstPage.exportAsPNG();
+      
+      // Upload PNG to storage
+      const pngPath = `${agentId}/${crypto.randomUUID()}.png`;
+      const { data: pngUpload, error: pngError } = await supabase.storage
+        .from('agent-files')
+        .upload(pngPath, pngImage, {
+          contentType: 'image/png',
+          upsert: false
+        });
+
+      if (pngError) throw pngError;
+
+      // Get the public URL of the PNG
       const { data: { publicUrl } } = supabase.storage
         .from('agent-files')
-        .getPublicUrl(filePath);
+        .getPublicUrl(pngPath);
 
-      console.log('Public URL:', publicUrl);
+      console.log('PNG Public URL:', publicUrl);
 
       const openAIResponse = await fetch('https://api.openai.com/v1/chat/completions', {
         method: 'POST',
@@ -118,6 +137,15 @@ serve(async (req) => {
       if (contentError) {
         console.error('Error storing content:', contentError);
         throw contentError;
+      }
+      
+      // Clean up temporary PNG
+      const { error: deleteError } = await supabase.storage
+        .from('agent-files')
+        .remove([pngPath]);
+
+      if (deleteError) {
+        console.error('Error deleting temporary PNG:', deleteError);
       }
       
       console.log('PDF content extracted and stored successfully');
