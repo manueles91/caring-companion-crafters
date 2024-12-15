@@ -47,11 +47,11 @@ const AgentList = ({ userRole, onCreateAgent }: AgentListProps) => {
 
   // Show carousel for signed out users
   if (!session) {
-    return <CarouselView agents={agents} />;
+    return <CarouselView key="carousel" agents={agents} />;
   }
 
   // Show grid for signed in users
-  return <GridView agents={agents} />;
+  return <GridView key="grid" agents={agents} />;
 };
 
 export default AgentList;
