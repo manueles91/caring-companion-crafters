@@ -70,25 +70,34 @@ serve(async (req) => {
         const page = pages[i];
         content += `Page ${i + 1}\n`;
         
-        // Access the internal PDFPage object to extract text content
-        const pageDict = (page as any).node;
-        const pageContent = pageDict.Contents();
-        
-        if (pageContent) {
-          // Convert PDF content stream to text
-          const textContent = pageContent.toString();
-          // Clean up common PDF operators and extract text between parentheses
-          const extractedText = textContent
-            .replace(/\\n/g, '\n')
-            .replace(/\\r/g, '')
-            .replace(/\\t/g, ' ')
-            .replace(/\\\(/g, '(')
-            .replace(/\\\)/g, ')')
-            .match(/\((.*?)\)/g)
-            ?.map(match => match.slice(1, -1))
-            .join(' ') || '';
+        try {
+          // Access the internal PDFPage object to extract text content
+          const pageDict = (page as any).node;
+          const pageContent = pageDict.Contents();
+          
+          if (pageContent) {
+            // Convert PDF content stream to text and handle escape sequences
+            const textContent = decodeURIComponent(escape(pageContent.toString()));
             
-          content += extractedText + '\n\n';
+            // Extract text between parentheses, handling escaped parentheses
+            const matches = textContent.match(/\((?:[^()\\]|\\.)*\)/g) || [];
+            const extractedText = matches
+              .map(match => {
+                // Remove outer parentheses and unescape special characters
+                return match
+                  .slice(1, -1)
+                  .replace(/\\([()\\])/g, '$1')
+                  .replace(/\\n/g, '\n')
+                  .replace(/\\r/g, '')
+                  .replace(/\\t/g, ' ');
+              })
+              .join(' ');
+            
+            content += extractedText + '\n\n';
+          }
+        } catch (error) {
+          console.error(`Error extracting text from page ${i + 1}:`, error);
+          content += `[Error extracting text from page ${i + 1}]\n\n`;
         }
       }
 
