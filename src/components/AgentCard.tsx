@@ -41,7 +41,7 @@ const AgentCard = ({ id, name, expertise, traits, onSelect }: AgentCardProps) =>
       </div>
       <div className="flex items-center justify-between mt-3">
         {session && <AgentInteractionCount agentId={id} />}
-        <AgentActions id={id} session={session} />
+        <AgentActions id={id} name={name} session={session} />
       </div>
     </Card>
   );
