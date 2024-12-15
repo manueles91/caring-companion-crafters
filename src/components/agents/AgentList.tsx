@@ -69,7 +69,7 @@ const AgentList = ({ userRole, onCreateAgent }: AgentListProps) => {
   // Show carousel for signed out users
   if (!userRole) {
     return (
-      <div className="container mx-auto px-8 relative">
+      <div className="container mx-auto relative">
         <Carousel
           opts={{
             align: "start",
