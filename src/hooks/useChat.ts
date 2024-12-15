@@ -2,28 +2,37 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useToast } from "@/components/ui/use-toast";
 import { supabase } from "@/integrations/supabase/client";
-import { Message, Agent } from "@/types/chat";
+import { Agent } from "@/types/chat";
 import { isValidUUID } from "@/utils/validation";
-import { useGuestInteractions } from "./useGuestInteractions";
-import { messageService } from "@/services/messageService";
+import { useGuestChat } from "./useGuestChat";
+import { useMessageHandling } from "./useMessageHandling";
 
 export const useChat = (agentId: string | null) => {
   const navigate = useNavigate();
   const [agent, setAgent] = useState<Agent | null>(null);
-  const [messages, setMessages] = useState<Message[]>([]);
-  const [input, setInput] = useState("");
-  const [isLoading, setIsLoading] = useState(false);
-  const [showGuestPrompt, setShowGuestPrompt] = useState(false);
   const { toast } = useToast();
-  const { checkGuestAccess, updateGuestInteraction } = useGuestInteractions();
+  
+  const {
+    messages,
+    input,
+    setInput,
+    isLoading,
+    loadMessages,
+    sendMessage
+  } = useMessageHandling();
+
+  const {
+    showGuestPrompt,
+    setShowGuestPrompt,
+    checkGuestStatus,
+    handleGuestMessage,
+    handleContinueAsGuest
+  } = useGuestChat(agent);
 
   useEffect(() => {
     const checkAccess = async () => {
-      const { data: { session } } = await supabase.auth.getSession();
-      if (!session) {
-        const hasAccess = await checkGuestAccess(agentId);
-        if (!hasAccess) return;
-      }
+      const hasAccess = await checkGuestStatus(agentId);
+      if (!hasAccess) return;
     };
     checkAccess();
   }, [agentId]);
@@ -59,12 +68,7 @@ export const useChat = (agentId: string | null) => {
 
         if (agentError) throw agentError;
         setAgent(agentData);
-
-        const { data: { session } } = await supabase.auth.getSession();
-        if (session) {
-          const messages = await messageService.fetchUserMessages(agentId, session.user.id);
-          setMessages(messages);
-        }
+        await loadMessages(agentId);
       } catch (error) {
         console.error('Error al cargar datos:', error);
         toast({
@@ -80,66 +84,12 @@ export const useChat = (agentId: string | null) => {
   }, [agentId, toast, navigate]);
 
   const handleSend = async () => {
-    if (!input.trim() || !agent) return;
-
     const { data: { session } } = await supabase.auth.getSession();
     if (!session) {
-      // Check if this is the second interaction
-      const guestId = localStorage.getItem('guestId');
-      if (guestId) {
-        const { data: interactions } = await supabase
-          .from('guest_interactions')
-          .select('interaction_count')
-          .eq('guest_id', guestId)
-          .eq('agent_id', agent.id)
-          .maybeSingle();
-
-        if (interactions?.interaction_count === 1) {
-          setShowGuestPrompt(true);
-          return;
-        }
-      }
-
-      const canProceed = await updateGuestInteraction(agent);
+      const canProceed = await handleGuestMessage();
       if (!canProceed) return;
     }
-
-    const userMessage: Message = { role: "user", content: input };
-    setMessages((prev) => [...prev, userMessage]);
-    setInput("");
-    setIsLoading(true);
-
-    try {
-      if (session) {
-        await messageService.storeMessage(userMessage, agent);
-      }
-
-      const assistantContent = await messageService.sendMessageToAgent([...messages, userMessage], agent);
-      const assistantMessage: Message = { 
-        role: "assistant", 
-        content: assistantContent 
-      };
-
-      if (session) {
-        await messageService.storeMessage(assistantMessage, agent);
-      }
-      
-      setMessages((prev) => [...prev, assistantMessage]);
-    } catch (error) {
-      console.error('Error en el chat:', error);
-      toast({
-        title: "Error",
-        description: "Lo siento, no pude enviar tu mensaje. Por favor, intenta de nuevo.",
-        variant: "destructive",
-      });
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const handleContinueAsGuest = () => {
-    setShowGuestPrompt(false);
-    handleSend();
+    await sendMessage(agent);
   };
 
   return {
