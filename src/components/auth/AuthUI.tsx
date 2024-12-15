@@ -4,10 +4,12 @@ import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 const AuthUI = () => {
   const { toast } = useToast();
   const navigate = useNavigate();
+  const { t } = useLanguage();
 
   useEffect(() => {
     const {
@@ -33,8 +35,8 @@ const AuthUI = () => {
       const error = session as any;
       if (error?.error?.message === "Invalid login credentials") {
         toast({
-          title: "Authentication Error",
-          description: "Invalid email or password. Please try again.",
+          title: t("auth.error.title"),
+          description: t("auth.error.invalidCredentials"),
           variant: "destructive",
         });
       }
@@ -43,13 +45,13 @@ const AuthUI = () => {
     return () => {
       subscription.unsubscribe();
     };
-  }, [toast, navigate]);
+  }, [toast, navigate, t]);
 
   return (
     <div className="max-w-md w-full mx-auto p-6">
-      <h2 className="text-2xl font-bold text-center mb-2">Welcome</h2>
+      <h2 className="text-2xl font-bold text-center mb-2">{t("auth.welcome")}</h2>
       <p className="text-center text-muted-foreground mb-6">
-        Create an account or sign in to continue
+        {t("auth.subtitle")}
       </p>
       <Auth
         supabaseClient={supabase}

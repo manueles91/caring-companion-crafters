@@ -31,6 +31,10 @@ const translations = {
     "features.personality.description": "Shape your assistant's behavior and communication style to match your preferences",
     "features.analytics.title": "Performance Insights",
     "features.analytics.description": "Track and analyze your assistant's interactions and effectiveness",
+    "auth.welcome": "Welcome",
+    "auth.subtitle": "Create an account or sign in to continue",
+    "auth.error.title": "Authentication Error",
+    "auth.error.invalidCredentials": "Invalid email or password. Please try again.",
   },
   es: {
     "nav.title": "Mis Asistentes",
@@ -54,6 +58,10 @@ const translations = {
     "features.personality.description": "Moldea el comportamiento y estilo de comunicación de tu asistente según tus preferencias",
     "features.analytics.title": "Análisis de Rendimiento",
     "features.analytics.description": "Rastrea y analiza las interacciones y efectividad de tu asistente",
+    "auth.welcome": "Bienvenido",
+    "auth.subtitle": "Crea una cuenta o inicia sesión para continuar",
+    "auth.error.title": "Error de Autenticación",
+    "auth.error.invalidCredentials": "Email o contraseña inválidos. Por favor, intenta de nuevo.",
   }
 };
 
