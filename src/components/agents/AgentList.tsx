@@ -81,7 +81,7 @@ const AgentList = ({ userRole, onCreateAgent }: AgentListProps) => {
         >
           <CarouselContent className="-ml-2 md:-ml-4">
             {agents.map((agent) => (
-              <CarouselItem key={agent.id} className="pl-2 md:pl-4 basis-full md:basis-1/3 lg:basis-1/3">
+              <CarouselItem key={agent.id} className="pl-2 md:pl-4 basis-1/2 md:basis-1/3 lg:basis-1/4">
                 <AgentCard
                   id={agent.id}
                   name={agent.name}
