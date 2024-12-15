@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import {
   Carousel,
   CarouselContent,
@@ -13,8 +13,8 @@ import Autoplay from "embla-carousel-autoplay";
 
 interface Feature {
   id: string;
-  title: string;
-  description: string;
+  titleKey: string;
+  descriptionKey: string;
   icon: React.ReactNode;
 }
 
@@ -25,32 +25,32 @@ const FeaturesCarousel = () => {
   const features: Feature[] = [
     {
       id: "knowledge-base",
-      title: "Knowledge Base",
-      description: "Upload files and images to enhance your assistant's knowledge and capabilities",
+      titleKey: "features.knowledge.title",
+      descriptionKey: "features.knowledge.description",
       icon: <BookOpen className="w-6 h-6" />,
     },
     {
       id: "long-memory",
-      title: "Continuous Learning",
-      description: "Your assistant remembers and learns from every conversation to provide better responses",
+      titleKey: "features.memory.title",
+      descriptionKey: "features.memory.description",
       icon: <Brain className="w-6 h-6" />,
     },
     {
       id: "customization",
-      title: "Custom Actions",
-      description: "Define specific actions and capabilities for your assistant to perform",
+      titleKey: "features.customization.title",
+      descriptionKey: "features.customization.description",
       icon: <Rocket className="w-6 h-6" />,
     },
     {
       id: "personality",
-      title: "Personality Traits",
-      description: "Shape your assistant's behavior and communication style to match your preferences",
+      titleKey: "features.personality.title",
+      descriptionKey: "features.personality.description",
       icon: <UserPlus className="w-6 h-6" />,
     },
     {
       id: "analytics",
-      title: "Performance Insights",
-      description: "Track and analyze your assistant's interactions and effectiveness",
+      titleKey: "features.analytics.title",
+      descriptionKey: "features.analytics.description",
       icon: <ChartBar className="w-6 h-6" />,
     },
   ];
@@ -87,10 +87,10 @@ const FeaturesCarousel = () => {
                       {feature.icon}
                     </div>
                     <h3 className="text-lg font-semibold dark:text-white">
-                      {feature.title}
+                      {t(feature.titleKey)}
                     </h3>
                     <p className="text-muted-foreground dark:text-gray-300">
-                      {feature.description}
+                      {t(feature.descriptionKey)}
                     </p>
                   </div>
                 </div>

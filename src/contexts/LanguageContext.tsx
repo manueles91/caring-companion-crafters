@@ -21,6 +21,16 @@ const translations = {
     "agents.noAgents": "No agents",
     "agents.noAgents.creator": "Create your first AI agent to get started",
     "agents.noAgents.user": "No agents available at this time",
+    "features.knowledge.title": "Knowledge Base",
+    "features.knowledge.description": "Upload files and images to enhance your assistant's knowledge and capabilities",
+    "features.memory.title": "Continuous Learning",
+    "features.memory.description": "Your assistant remembers and learns from every conversation to provide better responses",
+    "features.customization.title": "Custom Actions",
+    "features.customization.description": "Define specific actions and capabilities for your assistant to perform",
+    "features.personality.title": "Personality Traits",
+    "features.personality.description": "Shape your assistant's behavior and communication style to match your preferences",
+    "features.analytics.title": "Performance Insights",
+    "features.analytics.description": "Track and analyze your assistant's interactions and effectiveness",
   },
   es: {
     "nav.title": "Mis Asistentes",
@@ -34,6 +44,16 @@ const translations = {
     "agents.noAgents": "No hay agentes",
     "agents.noAgents.creator": "Crea tu primer agente IA para comenzar",
     "agents.noAgents.user": "No hay agentes disponibles en este momento",
+    "features.knowledge.title": "Base de Conocimiento",
+    "features.knowledge.description": "Sube archivos e imágenes para mejorar el conocimiento y las capacidades de tu asistente",
+    "features.memory.title": "Aprendizaje Continuo",
+    "features.memory.description": "Tu asistente recuerda y aprende de cada conversación para proporcionar mejores respuestas",
+    "features.customization.title": "Acciones Personalizadas",
+    "features.customization.description": "Define acciones y capacidades específicas para que tu asistente las realice",
+    "features.personality.title": "Rasgos de Personalidad",
+    "features.personality.description": "Moldea el comportamiento y estilo de comunicación de tu asistente según tus preferencias",
+    "features.analytics.title": "Análisis de Rendimiento",
+    "features.analytics.description": "Rastrea y analiza las interacciones y efectividad de tu asistente",
   }
 };
 
