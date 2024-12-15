@@ -1,23 +1,11 @@
 import React from "react";
 import { Card } from "./ui/card";
-import { Button } from "./ui/button";
-import { Trash2 } from "lucide-react";
 import AgentFormFields from "./agents/AgentFormFields";
+import AgentFormActions from "./agents/AgentFormActions";
 import { useAgentForm } from "@/hooks/useAgentForm";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/components/ui/use-toast";
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-  AlertDialogTrigger,
-} from "@/components/ui/alert-dialog";
 
 interface CreateAgentFormProps {
   agentId?: string | null;
@@ -91,62 +79,12 @@ const CreateAgentForm = ({ agentId }: CreateAgentFormProps) => {
           onToggleTrait={toggleTrait}
         />
 
-        <div className="space-y-4">
-          <div className="flex gap-4 justify-center">
-            <Button
-              type="button"
-              variant="secondary"
-              className="flex-1"
-              onClick={() => navigate('/')}
-            >
-              Cancelar
-            </Button>
-
-            <Button 
-              type="submit" 
-              className="flex-1"
-              disabled={isSubmitting}
-            >
-              {isSubmitting ? "Guardando..." : agentId ? "Guardar Cambios" : "Crear Agente"}
-            </Button>
-          </div>
-
-          {agentId && (
-            <div className="pt-4 border-t">
-              <AlertDialog>
-                <AlertDialogTrigger asChild>
-                  <Button
-                    type="button"
-                    variant="ghost"
-                    className="text-muted-foreground hover:text-destructive w-full"
-                  >
-                    <Trash2 className="h-4 w-4 mr-2" />
-                    Eliminar Agente
-                  </Button>
-                </AlertDialogTrigger>
-                <AlertDialogContent>
-                  <AlertDialogHeader>
-                    <AlertDialogTitle>¿Estás seguro?</AlertDialogTitle>
-                    <AlertDialogDescription>
-                      Esta acción eliminará permanentemente el agente. Esta acción no se puede deshacer.
-                    </AlertDialogDescription>
-                  </AlertDialogHeader>
-                  <AlertDialogFooter>
-                    <AlertDialogCancel>
-                      Cancelar
-                    </AlertDialogCancel>
-                    <AlertDialogAction 
-                      onClick={handleDelete}
-                      className="bg-red-500 hover:bg-red-600"
-                    >
-                      Eliminar
-                    </AlertDialogAction>
-                  </AlertDialogFooter>
-                </AlertDialogContent>
-              </AlertDialog>
-            </div>
-          )}
-        </div>
+        <AgentFormActions
+          isSubmitting={isSubmitting}
+          isEditing={!!agentId}
+          onCancel={() => navigate('/')}
+          onDelete={agentId ? handleDelete : undefined}
+        />
       </form>
     </Card>
   );
