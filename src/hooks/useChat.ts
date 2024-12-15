@@ -92,7 +92,7 @@ export const useChat = (agentId: string | null) => {
           .select('interaction_count')
           .eq('guest_id', guestId)
           .eq('agent_id', agent.id)
-          .single();
+          .maybeSingle();
 
         if (interactions?.interaction_count === 1) {
           setShowGuestPrompt(true);
