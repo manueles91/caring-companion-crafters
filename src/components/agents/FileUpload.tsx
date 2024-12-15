@@ -18,16 +18,31 @@ const FileUpload = ({ agentId, onUploadComplete }: FileUploadProps) => {
     if (!file || !agentId) return;
 
     setIsUploading(true);
-    const formData = new FormData();
-    formData.append('file', file);
-    formData.append('agentId', agentId);
 
     try {
       const { data: { session } } = await supabase.auth.getSession();
       if (!session) throw new Error('No authenticated session');
 
+      // Convert file to base64
+      const reader = new FileReader();
+      const filePromise = new Promise((resolve, reject) => {
+        reader.onload = () => resolve(reader.result);
+        reader.onerror = reject;
+        reader.readAsDataURL(file);
+      });
+
+      const base64File = await filePromise;
+      
       const { error } = await supabase.functions.invoke('process-files', {
-        body: formData,
+        body: {
+          file: {
+            name: file.name,
+            type: file.type,
+            size: file.size,
+            base64: base64File
+          },
+          agentId
+        }
       });
 
       if (error) throw error;

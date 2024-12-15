@@ -14,15 +14,22 @@ serve(async (req) => {
   }
 
   try {
-    const formData = await req.formData();
-    const file = formData.get('file') as File;
-    const agentId = formData.get('agentId') as string;
-
+    const { file, agentId } = await req.json();
+    
     if (!file || !agentId) {
       throw new Error('Missing required fields');
     }
 
     console.log('Processing file:', file.name, 'for agent:', agentId);
+
+    // Convert base64 to Blob
+    const base64Data = file.base64.split(',')[1];
+    const binaryData = atob(base64Data);
+    const bytes = new Uint8Array(binaryData.length);
+    for (let i = 0; i < binaryData.length; i++) {
+      bytes[i] = binaryData.charCodeAt(i);
+    }
+    const blob = new Blob([bytes], { type: file.type });
 
     const supabase = createClient(
       Deno.env.get('SUPABASE_URL') ?? '',
@@ -35,7 +42,7 @@ serve(async (req) => {
     // Upload file to storage
     const { data: uploadData, error: uploadError } = await supabase.storage
       .from('agent-files')
-      .upload(filePath, file, {
+      .upload(filePath, blob, {
         contentType: file.type,
         upsert: false
       });
@@ -62,7 +69,7 @@ serve(async (req) => {
       console.log('Extracting content from PDF using OpenAI');
       
       // Convert PDF to PNG using pdf.js
-      const arrayBuffer = await file.arrayBuffer();
+      const arrayBuffer = bytes.buffer;
       const loadingTask = pdfjs.getDocument({ data: arrayBuffer });
       const pdf = await loadingTask.promise;
       const page = await pdf.getPage(1);
@@ -85,13 +92,13 @@ serve(async (req) => {
       }).promise;
       
       // Convert canvas to blob
-      const blob = await canvas.convertToBlob({ type: 'image/png' });
+      const pngBlob = await canvas.convertToBlob({ type: 'image/png' });
       
       // Upload PNG to storage
       const pngPath = `${agentId}/${crypto.randomUUID()}.png`;
       const { data: pngUpload, error: pngError } = await supabase.storage
         .from('agent-files')
-        .upload(pngPath, blob, {
+        .upload(pngPath, pngBlob, {
           contentType: 'image/png',
           upsert: false
         });
@@ -112,7 +119,7 @@ serve(async (req) => {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          model: "gpt-4o",
+          model: "gpt-4-vision-preview",
           messages: [
             {
               role: "user",
@@ -130,7 +137,8 @@ serve(async (req) => {
                 }
               ]
             }
-          ]
+          ],
+          max_tokens: 4096
         })
       });
 
