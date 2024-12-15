@@ -115,7 +115,7 @@ const Index = () => {
         {!session && (
           <>
             <FeaturesCarousel />
-            <div id="auth-section" className="mt-8 p-6 bg-muted dark:bg-[#1A1F2C] rounded-lg scroll-mt-24">
+            <div id="auth-section" className="mt-8 p-6 bg-muted dark:bg-[#1A1F2C] rounded-lg scroll-mt-24 max-w-lg mx-auto text-center">
               <h2 className="text-xl font-semibold mb-4 dark:text-white">Want to do more?</h2>
               <p className="mb-4 dark:text-gray-300">Sign up to:</p>
               <ul className="list-disc list-inside mb-6 space-y-2 dark:text-gray-300">
